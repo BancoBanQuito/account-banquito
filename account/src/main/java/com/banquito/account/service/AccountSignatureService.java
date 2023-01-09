@@ -13,9 +13,8 @@ import com.banquito.account.repository.AccountSignatureRepository;
 public class AccountSignatureService {
     private final AccountSignatureRepository accountSignatureRepository;
     private final AccountRepository accountRepository;
-    // private final ClientRepository clientRepository;
+    // use api client
 
-    // add client repository
     public AccountSignatureService(AccountSignatureRepository accountSignatureRepository,
             AccountRepository accountRepository) {
         this.accountSignatureRepository = accountSignatureRepository;
@@ -32,8 +31,8 @@ public class AccountSignatureService {
 
     }
 
-    //must return a dto object
-    public List<AccountSignature> findByAccountCode(String local, String international){
-         return null;
+    // must return a dto object
+    public List<AccountSignature> findByAccountCode(String local, String international) {
+        return null;
     }
 }

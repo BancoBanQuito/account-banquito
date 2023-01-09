@@ -3,6 +3,7 @@ package com.banquito.account.controller;
 import com.banquito.account.model.Account;
 import com.banquito.account.model.AccountSignature;
 import com.banquito.account.service.AccountService;
+import com.banquito.account.service.AccountSignatureService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,9 +13,11 @@ import java.math.BigDecimal;
 @RequestMapping(value = "/api/account")
 public class AccountController {
     private final AccountService accountService;
+    private final AccountSignatureService accountSignatureService;
 
-    public AccountController(AccountService accountService) {
+    public AccountController(AccountService accountService, AccountSignatureService accountSignatureService) {
         this.accountService = accountService;
+        this.accountSignatureService = accountSignatureService;
     }
 
     @RequestMapping(value = "", method = RequestMethod.POST)
@@ -23,10 +26,23 @@ public class AccountController {
         return ResponseEntity.status(200).body("Object created");
     }
 
+    @RequestMapping(value = "accountCode/{account-code}/signature ", method = RequestMethod.POST)
+    public ResponseEntity<Object> createAccountSignature(
+            @RequestBody AccountSignature accountSignature) {
+        return ResponseEntity.status(201).body("Object created");
+    }
+
     @RequestMapping(value = "/{account-code}", method = RequestMethod.GET)
     public ResponseEntity<Object> suspendAccount(
             @PathVariable("account-code") String accountCode) {
         return ResponseEntity.status(200).body("Suspend Account");
+    }
+
+    @RequestMapping(value = "accountCode/{account-code}/signature ", method = RequestMethod.GET)
+    // must return a list dto AccountSignatureIdentificationDatesDto
+    public ResponseEntity<Object> findByAccount(
+            @PathVariable("local") String local, @PathVariable("international") String international) {
+        return ResponseEntity.status(201).body("List returned");
     }
 
     @RequestMapping(value = "/{account-code}", method = RequestMethod.PUT)
@@ -40,6 +56,13 @@ public class AccountController {
     public ResponseEntity<Object> inactiveAccount(
             @PathVariable("account-code") String accountCode) {
         return ResponseEntity.status(200).body("Change active account state");
+    }
+
+    @RequestMapping(value = "accountCode/{account-code}/signature", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteAccountSignature(
+            @PathVariable("codeLocalAccount") String codeLocalAccount,
+            @PathVariable("identification") String identification) {
+        return ResponseEntity.status(201).body("Object deleted");
     }
 
     @RequestMapping(value = "/{account-code}/statement", method = RequestMethod.GET)
