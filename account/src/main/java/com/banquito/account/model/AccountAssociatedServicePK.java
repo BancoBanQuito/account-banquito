@@ -11,16 +11,19 @@ import jakarta.persistence.Embeddable;
 @Embeddable
 public class AccountAssociatedServicePK implements Serializable {
 
-        @Column(name = "code_local_account", length = 20, nullable = false)
-        private String codelocalaccount;
+        @Column(name = "CODE_LOCAL_ACCOUNT", length = 20, nullable = false)
+        private String codeLocalAccount;
 
-        @Column(name = "code_international_account", length = 34, nullable = false)
-        private String codeinternationalaccount;
+        @Column(name = "CODE_INTERNATIONAL_ACCOUNT", length = 34, nullable = false)
+        private String codeInternationalAccount;
 
-        @Column(name = "code_product", length = 32, nullable = false)
-        private String codeproduct;
+        @Column(name = "CODE_PRODUCT", length = 32, nullable = false)
+        private String codeProduct;
 
-        @Column(name = "code_product_type", length = 32, nullable = false)
-        private String codeproducttype;
+        @Column(name = "CODE_PRODUCT_TYPE", length = 32, nullable = false)
+        private String codeProductType;
+
+        @Column(name = "CODE_ASSOCIATED_SERVICE", length = 16, nullable = false)
+        private String codeAssociatedService;
 
 }

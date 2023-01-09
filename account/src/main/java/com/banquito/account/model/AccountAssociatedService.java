@@ -17,38 +17,23 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "account_associated_service")
+@Table(name = "ACCOUNT_ASSOCIATED_SERVICE")
 public class AccountAssociatedService implements Serializable {
 
 	@EmbeddedId
 	@Include
 	private AccountAssociatedServicePK pk;
 
-	@Column(name = "code_associated_service", length = 16, nullable = false)
-	private String codeAssociatedService;
-
-	@Column(name = "status", length = 3, nullable = false)
+	@Column(name = "STATUS", length = 3, nullable = false)
 	private String status;
 
-	@Column(name = "start_date", nullable = false)
+	@Column(name = "START_DATE", nullable = false)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date startDate;
 
-	@Column(name = "end_date", nullable = true)
+	@Column(name = "END_DATE", nullable = true)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date endDate;
-
-	@Column(name = "code_local_account", length = 20, nullable = false, insertable = false, updatable = false)
-	private String codeLocalAccount;
-
-	@Column(name = "code_international_account", length = 34, nullable = false, insertable = false, updatable = false)
-	private String codeInternationalAccount;
-
-	@Column(name = "code_product", length = 32, nullable = false, insertable = false, updatable = false)
-	private String codeProduct;
-
-	@Column(name = "code_product_type", length = 32, nullable = false, insertable = false, updatable = false)
-	private String codeProductType;
 
 	public AccountAssociatedService(AccountAssociatedServicePK pk) {
 		this.pk = pk;
