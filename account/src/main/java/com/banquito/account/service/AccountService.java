@@ -74,4 +74,17 @@ public class AccountService {
     public List<Account> getClientAccounts(String identificationType, String identification) {
         return null;
     }
+
+    @Transactional
+    public void createAccountSignature(AccountSignature accountSignature) {
+    }
+
+    @Transactional
+    public void cancelAccountSignature(String codeAccount, String identification) {
+    }
+
+    // must return a dto object
+    public List<AccountSignature> findByAccountCode(String local, String international) {
+        return null;
+    }
 }
