@@ -10,13 +10,13 @@ import jakarta.persistence.Embeddable;
 @Embeddable
 public class AccountClientPK implements Serializable{
         @Column(name = "code_local_account", length = 20, nullable = false)
-        private String codelocalaccount;
+        private String codeLocalAccount;
 
         @Column(name = "code_international_account", length = 34, nullable = false)
-        private String codeinternationalaccount;
+        private String codeInternationalAccount;
 
         @Column(name = "identification_type", length = 3, nullable = false)
-        private String identificationtype;
+        private String identificationType;
 
         @Column(name = "identification", length = 20, nullable = false)
         private String identification;

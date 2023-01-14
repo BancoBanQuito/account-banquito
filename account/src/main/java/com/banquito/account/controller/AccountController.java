@@ -1,5 +1,11 @@
 package com.banquito.account.controller;
 
+import com.banquito.account.config.RSCode;
+import com.banquito.account.config.ResponseFormat;
+import com.banquito.account.controller.dto.RQCreateAccount;
+import com.banquito.account.controller.dto.RSCreateAccount;
+import com.banquito.account.controller.mapper.AccountMapper;
+import com.banquito.account.errors.RSRuntimeException;
 import com.banquito.account.model.Account;
 import com.banquito.account.model.AccountSignature;
 import com.banquito.account.service.AccountService;
@@ -17,10 +23,20 @@ public class AccountController {
         this.accountService = accountService;
     }
 
-    @RequestMapping(value = "", method = RequestMethod.POST)
-    public ResponseEntity<Object> createAccount(
-            @RequestBody Account account) {
-        return ResponseEntity.status(200).body("Object created");
+    @PostMapping
+    public ResponseEntity<ResponseFormat> createAccount(
+            @RequestBody RQCreateAccount account) {
+        try {
+            Account savedAccount = accountService.createAccount(AccountMapper.map(account), account.getIdentification(), account.getIdentificationType());
+            RSCreateAccount responseAccount = AccountMapper.map(savedAccount);
+            return ResponseEntity.status(RSCode.CREATED.code).body(ResponseFormat.builder().message("Success").data(responseAccount).build());
+        } catch (RSRuntimeException e) {
+            return ResponseEntity.status(e.getCode())
+                        .body(ResponseFormat.builder().message("Failure").data(e.getMessage()).build());
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                        .body(ResponseFormat.builder().message("Failure").data(e.getMessage()).build());
+        }
     }
 
     @RequestMapping(value = "accountCode/{account-code}/signature", method = RequestMethod.POST)

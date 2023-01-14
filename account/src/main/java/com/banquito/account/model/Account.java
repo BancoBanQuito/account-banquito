@@ -1,21 +1,25 @@
 package com.banquito.account.model;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.Table;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.Version;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode.Include;
 import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode.Include;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
+@Builder
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "account")
@@ -61,8 +65,6 @@ public class Account implements Serializable {
 	@Column(name = "available_balance", scale = 17, precision = 2, nullable = false)
 	private BigDecimal availableBalance;
 
-	public Account(AccountPK accountPK) {
-		this.pk = accountPK;
-	}
+	/* @Version
+	private long version; */
 }
-
