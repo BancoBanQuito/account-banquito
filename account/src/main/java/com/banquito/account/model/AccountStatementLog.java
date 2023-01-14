@@ -9,6 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -45,4 +46,7 @@ public class AccountStatementLog {
 
     @Column(name = "LAST_BALANCE", scale = 17, precision = 2)
     private BigDecimal lastBalance;
+
+    @Version
+	private long version;
 }

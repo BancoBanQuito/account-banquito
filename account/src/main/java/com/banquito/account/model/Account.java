@@ -65,6 +65,6 @@ public class Account implements Serializable {
 	@Column(name = "available_balance", scale = 17, precision = 2, nullable = false)
 	private BigDecimal availableBalance;
 
-	/* @Version
-	private long version; */
+	@Version
+	private long version;
 }

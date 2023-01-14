@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.Table;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,4 +33,7 @@ public class AccountClient implements Serializable{
 
     @Column(name = "status", length = 3, nullable = false)
     private String status;
+
+    @Version
+	private long version;
 }

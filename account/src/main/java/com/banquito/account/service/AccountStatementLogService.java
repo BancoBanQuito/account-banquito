@@ -20,9 +20,7 @@ import com.banquito.account.repository.AccountClientRepository;
 import com.banquito.account.repository.AccountStatementLogRepository;
 
 import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Service
 public class AccountStatementLogService {
 

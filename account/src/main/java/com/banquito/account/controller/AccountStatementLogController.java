@@ -1,6 +1,5 @@
 package com.banquito.account.controller;
 
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,9 +12,6 @@ import com.banquito.account.controller.dto.RSAccountStatement;
 import com.banquito.account.errors.RSRuntimeException;
 import com.banquito.account.service.AccountStatementLogService;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @RestController
 @RequestMapping(value = "/api/account/statement")
 public class AccountStatementLogController {
