@@ -19,14 +19,14 @@ public class AccountMapper {
 
     public static RSCreateAccount map(Account account) {
         return RSCreateAccount.builder()
-                .codeinternationalaccount(account.getPk().getCodeinternationalaccount())
-                .codelocalaccount(account.getPk().getCodelocalaccount())
+                .codeinternationalaccount(account.getPk().getCodeInternationalAccount())
+                .codelocalaccount(account.getPk().getCodeLocalAccount())
                 .build();
     }
 
     public static RSAccount mapAccount(Account account) {
         return RSAccount.builder()
-                .codeAccount(account.getPk().getCodelocalaccount())
+                .codeAccount(account.getPk().getCodeLocalAccount())
                 .presentBalance(account.getPresentBalance())
                 .availableBalance(account.getAvailableBalance())
                 .build();

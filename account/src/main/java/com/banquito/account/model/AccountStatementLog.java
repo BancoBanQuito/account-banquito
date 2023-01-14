@@ -9,11 +9,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.EqualsAndHashCode.Include;
 
+@Builder
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "ACCOUNT_STATEMENT_LOG")
 @Entity
@@ -39,7 +43,6 @@ public class AccountStatementLog {
     @Column(name = "PROM_BALANCE", scale = 17, precision = 2)
     private BigDecimal promBalance;
 
-    public AccountStatementLog(AccountStatementLogPK pk) {
-        this.pk = pk;
-    }
+    @Column(name = "LAST_BALANCE", scale = 17, precision = 2)
+    private BigDecimal lastBalance;
 }

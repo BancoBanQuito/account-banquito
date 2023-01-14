@@ -50,8 +50,8 @@ public class AccountService {
         String localAccountCode = BankUtils.RandomNumber.generateCode(20);
         String internationalAccountCode = BankUtils.RandomNumber.generateCode(34);
         AccountPK accountPK = new AccountPK();
-        accountPK.setCodeinternationalaccount(internationalAccountCode);
-        accountPK.setCodelocalaccount(localAccountCode);
+        accountPK.setCodeInternationalAccount(internationalAccountCode);
+        accountPK.setCodeLocalAccount(localAccountCode);
         account.setPk(accountPK);
         account.setStatus(AccountStatusCode.ACTIVATE.code);
         account.setCreateDate(createDate);
@@ -97,8 +97,8 @@ public class AccountService {
         try {
             accountClients.forEach(accountClient -> {
                 AccountPK pk = new AccountPK();
-                pk.setCodelocalaccount(accountClient.getPk().getCodeLocalAccount());
-                pk.setCodeinternationalaccount(accountClient.getPk().getCodeInternationalAccount());
+                pk.setCodeLocalAccount(accountClient.getPk().getCodeLocalAccount());
+                pk.setCodeInternationalAccount(accountClient.getPk().getCodeInternationalAccount());
                 Optional<Account> optionalAccount = this.accountRepository.findById(pk);
                 if (optionalAccount.isPresent()) {
                     Account account = optionalAccount.get();
@@ -106,7 +106,7 @@ public class AccountService {
                     /* Pedir el producto con un api */
                     String status = getAccountStatus(account.getStatus());
                     RSAccount rsAccount = RSAccount.builder()
-                            .codeAccount(account.getPk().getCodelocalaccount())
+                            .codeAccount(account.getPk().getCodeLocalAccount())
                             .status(status)
                             .product("Sample")
                             .presentBalance(account.getPresentBalance())
@@ -122,12 +122,12 @@ public class AccountService {
         return rsAccounts;
     }
 
-    private String getAccountStatus(String status){
-        if(status.equals(AccountStatusCode.ACTIVATE.code)) {
+    private String getAccountStatus(String status) {
+        if (status.equals(AccountStatusCode.ACTIVATE.code)) {
             return AccountStatusCode.ACTIVATE.name;
-        } else if(status.equals(AccountStatusCode.BLOCKED.code)) {
+        } else if (status.equals(AccountStatusCode.BLOCKED.code)) {
             return AccountStatusCode.BLOCKED.name;
-        } else if(status.equals(AccountStatusCode.SUSPEND.code)) {
+        } else if (status.equals(AccountStatusCode.SUSPEND.code)) {
             return AccountStatusCode.SUSPEND.name;
         } else {
             return null;

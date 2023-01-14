@@ -8,12 +8,10 @@ import com.banquito.account.controller.dto.RSCreateAccount;
 import com.banquito.account.controller.mapper.AccountMapper;
 import com.banquito.account.errors.RSRuntimeException;
 import com.banquito.account.model.Account;
-import com.banquito.account.model.AccountSignature;
 import com.banquito.account.service.AccountService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
