@@ -1,7 +1,10 @@
 package com.banquito.account.service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.banquito.Utils.BankUtils;
 import com.banquito.account.config.AccountStatusCode;
 import com.banquito.account.config.RSCode;
+import com.banquito.account.controller.dto.RSAccount;
 import com.banquito.account.errors.RSRuntimeException;
 import com.banquito.account.model.Account;
 import com.banquito.account.model.AccountClient;
@@ -28,6 +32,8 @@ public class AccountService {
 
     private final String ACCOUNT_NOT_CREATED = "Ha ocurrido un error al crear la cuenta";
     private final String NOT_ENOUGH_PARAM = "Faltan parametros en la peticion";
+    private final String NOT_FOUND_ACCOUNTS = "No hay cuentas asociadas al cliente";
+    private final String INTERNAL_ERROR = "Ha ocurrido un error";
 
     public AccountService(AccountRepository accountRepository, AccountClientRepository accountClientRepository) {
         this.accountRepository = accountRepository;
@@ -75,5 +81,56 @@ public class AccountService {
             throw new RSRuntimeException(this.ACCOUNT_NOT_CREATED, RSCode.INTERNAL_ERROR_SERVER);
         }
         return account;
+    }
+
+    public List<RSAccount> findAllAccountsByClient(String identificacionType, String identification) {
+        List<RSAccount> rsAccounts = new ArrayList<>();
+        List<AccountClient> accountClients = new ArrayList<>();
+
+        accountClients = this.accountClientRepository
+                .findByPkIdentificationAndPkIdentificationType(identification, identificacionType);
+        log.info("" + accountClients.size());
+        if (accountClients.size() <= 0) {
+            throw new RSRuntimeException(this.NOT_FOUND_ACCOUNTS, RSCode.NOT_FOUND);
+        }
+
+        try {
+            accountClients.forEach(accountClient -> {
+                AccountPK pk = new AccountPK();
+                pk.setCodelocalaccount(accountClient.getPk().getCodeLocalAccount());
+                pk.setCodeinternationalaccount(accountClient.getPk().getCodeInternationalAccount());
+                Optional<Account> optionalAccount = this.accountRepository.findById(pk);
+                if (optionalAccount.isPresent()) {
+                    Account account = optionalAccount.get();
+
+                    /* Pedir el producto con un api */
+                    String status = getAccountStatus(account.getStatus());
+                    RSAccount rsAccount = RSAccount.builder()
+                            .codeAccount(account.getPk().getCodelocalaccount())
+                            .status(status)
+                            .product("Sample")
+                            .presentBalance(account.getPresentBalance())
+                            .availableBalance(account.getAvailableBalance())
+                            .build();
+                    rsAccounts.add(rsAccount);
+                }
+            });
+        } catch (Exception e) {
+            throw new RSRuntimeException(this.INTERNAL_ERROR, RSCode.INTERNAL_ERROR_SERVER);
+        }
+
+        return rsAccounts;
+    }
+
+    private String getAccountStatus(String status){
+        if(status.equals(AccountStatusCode.ACTIVATE.code)) {
+            return AccountStatusCode.ACTIVATE.name;
+        } else if(status.equals(AccountStatusCode.BLOCKED.code)) {
+            return AccountStatusCode.BLOCKED.name;
+        } else if(status.equals(AccountStatusCode.SUSPEND.code)) {
+            return AccountStatusCode.SUSPEND.name;
+        } else {
+            return null;
+        }
     }
 }

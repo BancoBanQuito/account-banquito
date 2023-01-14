@@ -1,6 +1,6 @@
 package com.banquito.account.repository;
 
-import java.util.Optional;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -12,5 +12,6 @@ import com.banquito.account.model.AccountClientPK;
 public interface AccountClientRepository extends JpaRepository<AccountClient, AccountClientPK> {
 
     public boolean existsByPkCodeLocalAccountAndPkCodeInternationalAccount(String localAccountCode, String internationalAccountCode);
-    public Optional<AccountClient> findByPkCodeLocalAccountAndPkCodeInternationalAccount(String localAccountCode, String internationalAccountCode);
+    public List<AccountClient> findByPkCodeLocalAccountAndPkCodeInternationalAccount(String localAccountCode, String internationalAccountCode);
+    public List<AccountClient> findByPkIdentificationAndPkIdentificationType(String identification, String identificationType);
 }
