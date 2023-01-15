@@ -39,9 +39,9 @@ public class AccountController {
         }
     }
 
-    @GetMapping("/{identification-type}/{identification}")
+    @GetMapping("/{identificationType}/{identification}")
     public ResponseEntity<ResponseFormat> getConsolidateAccounts(
-        @PathVariable("identification-type") String identificationType,
+        @PathVariable("identificationType") String identificationType,
         @PathVariable("identification") String identification
     ) {
         try {

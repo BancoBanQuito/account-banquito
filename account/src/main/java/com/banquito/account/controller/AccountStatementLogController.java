@@ -22,8 +22,8 @@ public class AccountStatementLogController {
         this.accountStatementLogService = accountStatementLogService;
     }
 
-    @GetMapping("/{account-code}")
-    public ResponseEntity<ResponseFormat> findAccountStatement(@PathVariable("account-code") String accountCode) {
+    @GetMapping("/{accountCode}")
+    public ResponseEntity<ResponseFormat> findAccountStatement(@PathVariable("accountCode") String accountCode) {
         try {
             RSAccountStatement rsAccountStatement = this.accountStatementLogService.findAccountStatement(accountCode);
             return ResponseEntity.status(RSCode.SUCCESS.code)
