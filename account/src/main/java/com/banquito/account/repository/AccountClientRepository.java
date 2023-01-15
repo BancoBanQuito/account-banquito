@@ -13,7 +13,9 @@ import com.banquito.account.model.AccountClientPK;
 public interface AccountClientRepository extends JpaRepository<AccountClient, AccountClientPK> {
 
     public boolean existsByPkCodeLocalAccountAndPkCodeInternationalAccount(String localAccountCode, String internationalAccountCode);
-    public List<AccountClient> findByPkCodeLocalAccountAndPkCodeInternationalAccount(String localAccountCode, String internationalAccountCode);
+    //public List<AccountClient> findByPkCodeLocalAccountAndPkCodeInternationalAccount(String localAccountCode, String internationalAccountCode);
     public List<AccountClient> findByPkIdentificationAndPkIdentificationType(String identification, String identificationType);
     public Optional<AccountClient> findByPkCodeLocalAccountOrPkCodeInternationalAccount(String accountLocalCode, String accountInternationalCode);
+    public boolean existsByPkIdentificationAndPkIdentificationType(String identification, String identificationType);
+    public Optional<AccountClient> findByPkCodeLocalAccountAndPkCodeInternationalAccount(String localAccountCode, String internationalAccountCode);
 }
