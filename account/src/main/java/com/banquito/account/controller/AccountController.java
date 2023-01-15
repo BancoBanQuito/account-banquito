@@ -65,12 +65,12 @@ public class AccountController {
             return ResponseEntity.status(500)
                         .body(ResponseFormat.builder().message("Failure").data(e.getMessage()).build());
         }
-    @RequestMapping(value = "/signature/{identificationType}/{identification}/{codeLocalAccount}/{codeInternationalAccount}", method = RequestMethod.POST)
+    }
+    @RequestMapping(value = "/signature/{identificationType}/{identification}/{codeAccount}", method = RequestMethod.POST)
     public ResponseEntity<ResponseFormat> createAccountSignature(
             @PathVariable("identificationType") String identificationType,
             @PathVariable("identification") String identification,
-            @PathVariable("codeLocalAccount") String codeLocalAccount,
-            @PathVariable("codeInternationalAccount") String codeInternationalAccount,
+            @PathVariable("codeAccount") String codeAccount,
             @RequestBody RQCreateAccountSignature rqCreateAccountSignature) {
         try {
             // estos datos deben ser retornados de API Cliente
@@ -79,8 +79,7 @@ public class AccountController {
             AccountSignature savedAccountSignature = accountSignatureService.createAccountSignature(
                     AccountSignatureMapper.mapCreation(rqCreateAccountSignature),
                     identification, identificationType,
-                    codeLocalAccount,
-                    codeInternationalAccount, signature);
+                    codeAccount, signature);
 
             RSCreateAccountSignature responseAccountSignature = AccountSignatureMapper
                     .mapCreation(savedAccountSignature, name, signature);

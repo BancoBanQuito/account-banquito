@@ -2,6 +2,7 @@ package com.banquito.account.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -9,6 +10,8 @@ import com.banquito.account.config.AccountStatusCode;
 import com.banquito.account.config.RSCode;
 import com.banquito.account.errors.RSRuntimeException;
 import com.banquito.account.model.Account;
+import com.banquito.account.model.AccountClient;
+import com.banquito.account.model.AccountClientPK;
 import com.banquito.account.model.AccountSignature;
 import com.banquito.account.model.AccountSignaturePK;
 import com.banquito.account.repository.AccountClientRepository;
@@ -25,6 +28,8 @@ public class AccountSignatureService {
 
     private final String ACCOUNT_NOT_CREATED = "Ha ocurrido un error al crear la firma asociada";
     private final String NOT_ENOUGH_PARAM = "Faltan parametros en la peticion";
+    private final String NOT_FOUND_ACCOUNT = "Cuenta no encontrada";
+    private final String NOT_FOUND_CLIENT_PK = "Cliente no cuenta con una cuenta asociada";
 
     public AccountSignatureService(AccountSignatureRepository accountSignatureRepository, AccountClientRepository accountClientRepository) {
         this.accountSignatureRepository = accountSignatureRepository;
@@ -32,20 +37,28 @@ public class AccountSignatureService {
     }
 
     public AccountSignature createAccountSignature(AccountSignature accountSignature, String identification,
-            String identificationType, String codeLocalAccount, String codeInternationalAccount, String signature) {
+            String identificationType, String codeAccount, String signature) {
 
         if (accountSignature.equals(null) || identification.isEmpty() || identificationType.isEmpty()
-                || codeLocalAccount.isEmpty() || codeInternationalAccount.isEmpty()) {
+                || codeAccount.isEmpty()) {
             throw new RSRuntimeException(this.NOT_ENOUGH_PARAM, RSCode.NOT_FOUND);
         }
+        
+        Optional<AccountClient> optionalAccountClient = this.accountClientRepository
+        .findByPkCodeLocalAccountOrPkCodeInternationalAccount(codeAccount, codeAccount);
 
-        AccountSignaturePK accountSignaturePK = new AccountSignaturePK(codeLocalAccount, codeInternationalAccount,
+        if (!optionalAccountClient.isPresent()) {
+            throw new RSRuntimeException(this.NOT_FOUND_ACCOUNT, RSCode.NOT_FOUND);
+        }
+        
+        boolean existClient = this.accountClientRepository.existsByPkIdentificationAndPkIdentificationType(identification, identificationType);
+        
+
+        AccountSignaturePK accountSignaturePK = new AccountSignaturePK(optionalAccountClient.get().getPk().getCodeLocalAccount(),
+        optionalAccountClient.get().getPk().getCodeInternationalAccount(),
                 identificationType, identification);
 
-        //verificar si existe o no un cliente en account client
-
-        boolean existClient = this.accountClientRepository.existsByPkIdentificationAndPkIdentificationType(identification, identificationType);
-
+    
         List<AccountSignature> accountSignaturePKs = this.accountSignatureRepository
                 .findByPk(accountSignaturePK);
 // && existClient
@@ -55,13 +68,13 @@ public class AccountSignatureService {
             accountSignature.setSignatureReference(signature);
             accountSignature.setCreateDate(new Date());
             accountSignature.setStartDate(new Date());
+            accountSignature.setVersion(1);
        // }
         try{
             log.info(accountSignature.toString());
             this.accountSignatureRepository.save(accountSignature);
         }catch (Exception e) {
-            //this.ACCOUNT_NOT_CREATED
-            throw new RSRuntimeException(e.getMessage(), RSCode.INTERNAL_ERROR_SERVER);
+            throw new RSRuntimeException(this.ACCOUNT_NOT_CREATED, RSCode.INTERNAL_ERROR_SERVER);
         }
         log.info(accountSignature.toString());
         return accountSignature;
