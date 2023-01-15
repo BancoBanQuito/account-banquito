@@ -3,9 +3,14 @@ package com.banquito.account.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinColumns;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.Table;
 import jakarta.persistence.TemporalType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode.Include;
 import lombok.NoArgsConstructor;
@@ -13,7 +18,10 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.util.Date;
 
+
+@Builder
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "account_signature")
@@ -43,6 +51,13 @@ public class AccountSignature implements Serializable{
     @Column(name = "end_date", nullable = true)
     private Date endDate;
 
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "code_local_account", referencedColumnName = "code_local_account", insertable = false, updatable = false),
+            @JoinColumn(name = "code_international_account", referencedColumnName = "code_international_account", insertable = false, updatable = false),
+    })
+    private Account account;
+    
     public AccountSignature(AccountSignaturePK pk) {
         this.pk = pk;
     }
