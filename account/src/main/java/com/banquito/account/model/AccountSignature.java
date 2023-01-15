@@ -9,7 +9,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.Table;
 import jakarta.persistence.TemporalType;
+<<<<<<< HEAD
 import jakarta.persistence.Version;
+=======
+>>>>>>> 727a053a18c59e8d8993c5ca33e4e4066e353c44
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

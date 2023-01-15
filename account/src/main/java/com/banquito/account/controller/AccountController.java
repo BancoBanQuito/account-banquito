@@ -60,10 +60,10 @@ public class AccountController {
             return ResponseEntity.status(RSCode.SUCCESS.code).body(ResponseFormat.builder().message("Success").data(rsAccounts).build());
         } catch (RSRuntimeException e) {
             return ResponseEntity.status(e.getCode())
-                        .body(ResponseFormat.builder().message("Failure").data(e.getMessage()).build());
+                    .body(ResponseFormat.builder().message("Failure").data(e.getMessage()).build());
         } catch (Exception e) {
             return ResponseEntity.status(500)
-                        .body(ResponseFormat.builder().message("Failure").data(e.getMessage()).build());
+                    .body(ResponseFormat.builder().message("Failure").data(e.getMessage()).build());
         }
     }
     @RequestMapping(value = "/signature/{identificationType}/{identification}/{codeAccount}", method = RequestMethod.POST)
