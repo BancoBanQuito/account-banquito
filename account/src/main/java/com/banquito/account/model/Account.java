@@ -66,5 +66,5 @@ public class Account implements Serializable {
 	private BigDecimal availableBalance;
 
 	@Version
-	private long version;
+	private Long version;
 }

@@ -1,6 +1,6 @@
-package com.banquito.account.errors;
+package com.banquito.account.exception;
 
-import com.banquito.account.config.RSCode;
+import com.banquito.account.utils.RSCode;
 
 public class RSRuntimeException extends RuntimeException {
 

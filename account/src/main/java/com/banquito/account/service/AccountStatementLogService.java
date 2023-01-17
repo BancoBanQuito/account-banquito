@@ -6,12 +6,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import com.banquito.account.utils.Utils;
 import org.springframework.stereotype.Service;
 
-import com.banquito.account.config.RSCode;
+import com.banquito.account.utils.RSCode;
 import com.banquito.account.controller.dto.RSAccountStatement;
 import com.banquito.account.controller.mapper.AccountStatementMapper;
-import com.banquito.account.errors.RSRuntimeException;
+import com.banquito.account.exception.RSRuntimeException;
 import com.banquito.account.model.Account;
 import com.banquito.account.model.AccountClient;
 import com.banquito.account.model.AccountStatementLog;
@@ -52,7 +53,7 @@ public class AccountStatementLogService {
 
         /* ----------------- Last Account Statement ----------------- */
         Optional<AccountStatementLog> optionalLastAccountStatement = this.accountStatementLogRepository
-                .findTopByOrderByPkActualCutOffDateDesc();
+                .findTopByOrderByCurrentCutOffDateDesc();
         if (!optionalLastAccountStatement.isPresent()) {
             throw new RSRuntimeException(this.NOT_FOUND_ACCOUNT_STATEMENT, RSCode.NOT_FOUND);
         }
@@ -61,7 +62,7 @@ public class AccountStatementLogService {
         /* ----------------- Transactions ----------------- */
         List<RSAccountStatement.Transaction> transactions = optionalLastAccountStatement.isPresent()
                 ? this.retriveAllTransactions(accountCode,
-                        optionalLastAccountStatement.get().getPk().getActualCutOffDate(),
+                        optionalLastAccountStatement.get().getCurrentCutOffDate(),
                         new Date())
                 : this.retriveAllTransactions(accountCode, new Date(), new Date());
 
@@ -86,19 +87,18 @@ public class AccountStatementLogService {
             String type, Optional<AccountStatementLog> optionalLastAccountStatement) {
 
         AccountStatementLogPK pk = new AccountStatementLogPK();
-        pk.setActualCutOffDate(new Date());
+        pk.setCodeAccountStateLog(Utils.generateAlphanumericCode(10));
         pk.setCodeInternationalAccount(account.getPk().getCodeInternationalAccount());
         pk.setCodeLocalAccount(account.getPk().getCodeLocalAccount());
 
         AccountStatementLog accountStatementLog = AccountStatementLog.builder()
                 .pk(pk)
                 .lastCutOffDate(optionalLastAccountStatement.isPresent()
-                        ? optionalLastAccountStatement.get().getPk().getActualCutOffDate()
+                        ? optionalLastAccountStatement.get().getCurrentCutOffDate()
                         : new Date())
-                .type(type)
-                .interestRate(interestRate)
-                .actualBalance(account.getPresentBalance())
-                .promBalance(promBalance)
+                .interest(interestRate)
+                .currentBalance(account.getPresentBalance())
+                .averageCashBalance(promBalance)
                 .build();
 
         return accountStatementLog;

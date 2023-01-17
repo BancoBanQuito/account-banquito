@@ -23,6 +23,7 @@ import java.util.Date;
 @Entity
 @Table(name = "account_client")
 public class AccountClient implements Serializable{
+
     @EmbeddedId
     @Include
     private AccountClientPK pk;
@@ -35,5 +36,5 @@ public class AccountClient implements Serializable{
     private String status;
 
     @Version
-	private long version;
+	private Long version;
 }

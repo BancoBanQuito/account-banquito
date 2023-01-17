@@ -1,12 +1,6 @@
 package com.banquito.account.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-import jakarta.persistence.Version;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -41,5 +35,12 @@ public class AccountAssociatedService implements Serializable {
 	private Date endDate;
 
 	@Version
-	private long version;
+	private Long version;
+
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "code_local_account", referencedColumnName = "code_local_account", insertable = false, updatable = false),
+			@JoinColumn(name = "code_international_account", referencedColumnName = "code_international_account", insertable = false, updatable = false),
+	})
+	private Account account;
 }

@@ -15,11 +15,11 @@ public class AccountStatementMapper {
                 .accountCode(accountClient.getPk().getCodeLocalAccount())
                 .clientIdentification(accountClient.getPk().getIdentification())
                 .lastCutOffDate(accountStatementLog.getLastCutOffDate())
-                .actualCutOffDate(accountStatementLog.getPk().getActualCutOffDate())
-                .lastBalance(accountStatementLog.getLastBalance())
-                .interestRate(accountStatementLog.getInterestRate())
-                .presentBalance(accountStatementLog.getActualBalance())
-                .promBalance(accountStatementLog.getPromBalance())
+                .actualCutOffDate(accountStatementLog.getCurrentCutOffDate())
+                .lastBalance(accountStatementLog.getPreviousBalance())
+                .interestRate(accountStatementLog.getInterest())
+                .presentBalance(accountStatementLog.getCurrentBalance())
+                .promBalance(accountStatementLog.getAverageCashBalance())
                 .transactions(transactions)
                 .build();
 

@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.banquito.account.config.RSCode;
-import com.banquito.account.config.ResponseFormat;
+import com.banquito.account.utils.RSCode;
+import com.banquito.account.utils.ResponseFormat;
 import com.banquito.account.controller.dto.RSAccountStatement;
-import com.banquito.account.errors.RSRuntimeException;
+import com.banquito.account.exception.RSRuntimeException;
 import com.banquito.account.service.AccountStatementLogService;
 
 @RestController

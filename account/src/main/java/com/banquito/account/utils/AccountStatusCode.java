@@ -1,4 +1,4 @@
-package com.banquito.account.config;
+package com.banquito.account.utils;
 
 public enum AccountStatusCode {
 

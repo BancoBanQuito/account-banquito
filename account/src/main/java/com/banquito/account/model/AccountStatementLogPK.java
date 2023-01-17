@@ -13,13 +13,12 @@ import lombok.Data;
 @Embeddable
 public class AccountStatementLogPK implements Serializable {
 
-    @Column(name = "CODE_LOCAL_ACCOUNT", length = 20, nullable = false)
+    @Column(name = "code_account_state_log", length = 10, nullable = false)
+    private String codeAccountStateLog;
+
+    @Column(name = "code_local_account", length = 20, nullable = false)
     private String codeLocalAccount;
 
     @Column(name = "code_international_account", length = 34, nullable = false)
     private String codeInternationalAccount;
-
-    @Column(name = "ACTUAL_CUT_OFF_DATE")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date actualCutOffDate;
 }

@@ -9,6 +9,7 @@ import jakarta.persistence.Embeddable;
 @Data
 @Embeddable
 public class AccountClientPK implements Serializable{
+
         @Column(name = "code_local_account", length = 20, nullable = false)
         private String codeLocalAccount;
 

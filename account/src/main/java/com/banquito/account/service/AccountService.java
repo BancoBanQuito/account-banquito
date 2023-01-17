@@ -2,18 +2,17 @@ package com.banquito.account.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.banquito.Utils.BankUtils;
-import com.banquito.account.config.AccountStatusCode;
-import com.banquito.account.config.RSCode;
+import com.banquito.account.utils.Utils;
+import com.banquito.account.utils.AccountStatusCode;
+import com.banquito.account.utils.RSCode;
 import com.banquito.account.controller.dto.RSAccount;
-import com.banquito.account.errors.RSRuntimeException;
+import com.banquito.account.exception.RSRuntimeException;
 import com.banquito.account.model.Account;
 import com.banquito.account.model.AccountClient;
 import com.banquito.account.model.AccountClientPK;
@@ -46,18 +45,15 @@ public class AccountService {
             throw new RSRuntimeException(this.NOT_ENOUGH_PARAM, RSCode.NOT_FOUND);
         }
 
-        Date createDate = new Date();
-        String localAccountCode = BankUtils.RandomNumber.generateCode(20);
-        String internationalAccountCode = BankUtils.RandomNumber.generateCode(34);
+        String localAccountCode = Utils.generateNumberCode(20);
+        String internationalAccountCode = Utils.generateNumberCode(34);
         AccountPK accountPK = new AccountPK();
         accountPK.setCodeInternationalAccount(internationalAccountCode);
         accountPK.setCodeLocalAccount(localAccountCode);
         account.setPk(accountPK);
         account.setStatus(AccountStatusCode.ACTIVATE.code);
-        account.setCreateDate(createDate);
-
-        account.setLastUpdateDate(createDate);
-        account.setCloseDate(createDate);
+        account.setCreateDate(Utils.currentDate());
+        account.setLastUpdateDate(Utils.currentDate());
         account.setAvailableBalance(new BigDecimal(0));
         account.setPresentBalance(new BigDecimal(0));
 
@@ -72,7 +68,7 @@ public class AccountService {
         AccountClient accountClient = AccountClient.builder()
                 .pk(accountClientPK)
                 .status(AccountStatusCode.ACTIVATE.code)
-                .createDate(createDate)
+                .createDate(Utils.currentDate())
                 .build();
         try {
             this.accountRepository.save(account);
@@ -83,12 +79,12 @@ public class AccountService {
         return account;
     }
 
-    public List<RSAccount> findAllAccountsByClient(String identificacionType, String identification) {
+    public List<RSAccount> findAllAccountsByClient(String identificationType, String identification) {
         List<RSAccount> rsAccounts = new ArrayList<>();
         List<AccountClient> accountClients = new ArrayList<>();
 
         accountClients = this.accountClientRepository
-                .findByPkIdentificationAndPkIdentificationType(identification, identificacionType);
+                .findByPkIdentificationAndPkIdentificationType(identification, identificationType);
         log.info("" + accountClients.size());
         if (accountClients.size() <= 0) {
             throw new RSRuntimeException(this.NOT_FOUND_ACCOUNTS, RSCode.NOT_FOUND);

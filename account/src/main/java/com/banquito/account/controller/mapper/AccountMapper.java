@@ -19,8 +19,8 @@ public class AccountMapper {
 
     public static RSCreateAccount map(Account account) {
         return RSCreateAccount.builder()
-                .codeinternationalaccount(account.getPk().getCodeInternationalAccount())
-                .codelocalaccount(account.getPk().getCodeLocalAccount())
+                .codeInternationalAccount(account.getPk().getCodeInternationalAccount())
+                .codeLocalAccount(account.getPk().getCodeLocalAccount())
                 .build();
     }
 
