@@ -3,13 +3,7 @@ package com.banquito.account.model;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-import jakarta.persistence.Version;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,33 +14,47 @@ import lombok.EqualsAndHashCode.Include;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "ACCOUNT_STATEMENT_LOG")
 @Entity
+@Table(name = "account_statement_log")
 public class AccountStatementLog {
 
-    @Include
     @EmbeddedId
+    @Include
     private AccountStatementLogPK pk;
 
-    @Column(name = "LAST_CUT_OFF_DATE")
-    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "current_cut_off_date")
+    @Temporal(TemporalType.DATE)
+    private Date currentCutOffDate;
+
+    @Column(name = "last_cut_off_date")
+    @Temporal(TemporalType.DATE)
     private Date lastCutOffDate;
 
-    @Column(name = "TYPE", length = 3)
-    private String type;
+    @Column(name = "previous_balance", scale = 17, precision = 2)
+    private BigDecimal previousBalance;
 
-    @Column(name = "INTEREST_RATE", scale = 5, precision = 2)
-    private BigDecimal interestRate;
+    @Column(name = "credit_movements", scale = 17, precision = 2)
+    private BigDecimal creditMovements;
 
-    @Column(name = "ACTUAL_BALANCE", scale = 17, precision = 2)
-    private BigDecimal actualBalance;
+    @Column(name = "debit_movements", scale = 17, precision = 2)
+    private BigDecimal debitMovements;
 
-    @Column(name = "PROM_BALANCE", scale = 17, precision = 2)
-    private BigDecimal promBalance;
+    @Column(name = "interest", scale = 17, precision = 2)
+    private BigDecimal interest;
 
-    @Column(name = "LAST_BALANCE", scale = 17, precision = 2)
-    private BigDecimal lastBalance;
+    @Column(name = "current_balance", scale = 17, precision = 2)
+    private BigDecimal currentBalance;
+
+    @Column(name = "average_cash_balance", scale = 17, precision = 2)
+    private BigDecimal averageCashBalance;
 
     @Version
-	private long version;
+	private Long version;
+
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "code_local_account", referencedColumnName = "code_local_account", insertable = false, updatable = false),
+            @JoinColumn(name = "code_international_account", referencedColumnName = "code_international_account", insertable = false, updatable = false),
+    })
+    private Account account;
 }

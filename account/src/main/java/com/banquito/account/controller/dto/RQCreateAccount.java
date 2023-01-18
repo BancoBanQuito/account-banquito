@@ -6,13 +6,19 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
 public class RQCreateAccount implements Serializable {
+
     private String identification;
+
     private String identificationType;
+
     private String codeBranch;
+
     private String entityBankCode;
+
     private String internationalBankCode;
+
     private String codeProduct;
+
     private String codeProductType;
 }

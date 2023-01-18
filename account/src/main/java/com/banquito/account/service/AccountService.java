@@ -2,22 +2,20 @@ package com.banquito.account.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import com.banquito.account.model.*;
+import com.banquito.account.repository.AccountAssociatedServiceRepository;
+import com.banquito.account.utils.Messages;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.banquito.Utils.BankUtils;
-import com.banquito.account.config.AccountStatusCode;
-import com.banquito.account.config.RSCode;
+import com.banquito.account.utils.Utils;
+import com.banquito.account.utils.Status;
+import com.banquito.account.utils.RSCode;
 import com.banquito.account.controller.dto.RSAccount;
-import com.banquito.account.errors.RSRuntimeException;
-import com.banquito.account.model.Account;
-import com.banquito.account.model.AccountClient;
-import com.banquito.account.model.AccountClientPK;
-import com.banquito.account.model.AccountPK;
+import com.banquito.account.exception.RSRuntimeException;
 import com.banquito.account.repository.AccountClientRepository;
 import com.banquito.account.repository.AccountRepository;
 
@@ -29,35 +27,31 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final AccountClientRepository accountClientRepository;
+    private final AccountAssociatedServiceRepository accountAssociatedServiceRepository;
 
-    private final String ACCOUNT_NOT_CREATED = "Ha ocurrido un error al crear la cuenta";
-    private final String NOT_ENOUGH_PARAM = "Faltan parametros en la peticion";
-    private final String NOT_FOUND_ACCOUNTS = "No hay cuentas asociadas al cliente";
-    private final String INTERNAL_ERROR = "Ha ocurrido un error";
-
-    public AccountService(AccountRepository accountRepository, AccountClientRepository accountClientRepository) {
+    public AccountService(AccountRepository accountRepository,
+                          AccountClientRepository accountClientRepository,
+                          AccountAssociatedServiceRepository accountAssociatedServiceRepository) {
         this.accountRepository = accountRepository;
         this.accountClientRepository = accountClientRepository;
+        this.accountAssociatedServiceRepository = accountAssociatedServiceRepository;
     }
 
     @Transactional
     public Account createAccount(Account account, String identification, String identificationType) {
         if (identification.isEmpty() || identificationType.isEmpty() || account.equals(null)) {
-            throw new RSRuntimeException(this.NOT_ENOUGH_PARAM, RSCode.NOT_FOUND);
+            throw new RSRuntimeException(Messages.MISSING_PARAMS, RSCode.NOT_FOUND);
         }
 
-        Date createDate = new Date();
-        String localAccountCode = BankUtils.RandomNumber.generateCode(20);
-        String internationalAccountCode = BankUtils.RandomNumber.generateCode(34);
+        String localAccountCode = Utils.generateNumberCode(20);
+        String internationalAccountCode = Utils.generateNumberCode(34);
         AccountPK accountPK = new AccountPK();
         accountPK.setCodeInternationalAccount(internationalAccountCode);
         accountPK.setCodeLocalAccount(localAccountCode);
         account.setPk(accountPK);
-        account.setStatus(AccountStatusCode.ACTIVATE.code);
-        account.setCreateDate(createDate);
-
-        account.setLastUpdateDate(createDate);
-        account.setCloseDate(createDate);
+        account.setStatus(Status.ACTIVATE.code);
+        account.setCreateDate(Utils.currentDate());
+        account.setLastUpdateDate(Utils.currentDate());
         account.setAvailableBalance(new BigDecimal(0));
         account.setPresentBalance(new BigDecimal(0));
 
@@ -71,27 +65,27 @@ public class AccountService {
 
         AccountClient accountClient = AccountClient.builder()
                 .pk(accountClientPK)
-                .status(AccountStatusCode.ACTIVATE.code)
-                .createDate(createDate)
+                .status(Status.ACTIVATE.code)
+                .createDate(Utils.currentDate())
                 .build();
         try {
             this.accountRepository.save(account);
             this.accountClientRepository.save(accountClient);
         } catch (Exception e) {
-            throw new RSRuntimeException(this.ACCOUNT_NOT_CREATED, RSCode.INTERNAL_ERROR_SERVER);
+            throw new RSRuntimeException(Messages.ACCOUNT_NOT_CREATED, RSCode.INTERNAL_ERROR_SERVER);
         }
         return account;
     }
 
-    public List<RSAccount> findAllAccountsByClient(String identificacionType, String identification) {
+    public List<RSAccount> findAllAccountsByClient(String identificationType, String identification) {
         List<RSAccount> rsAccounts = new ArrayList<>();
         List<AccountClient> accountClients = new ArrayList<>();
 
         accountClients = this.accountClientRepository
-                .findByPkIdentificationAndPkIdentificationType(identification, identificacionType);
+                .findByPkIdentificationAndPkIdentificationType(identification, identificationType);
         log.info("" + accountClients.size());
-        if (accountClients.size() <= 0) {
-            throw new RSRuntimeException(this.NOT_FOUND_ACCOUNTS, RSCode.NOT_FOUND);
+        if (accountClients.size() < 1) {
+            throw new RSRuntimeException(Messages.NOT_FOUND_ACCOUNTS_FOR_CLIENT, RSCode.NOT_FOUND);
         }
 
         try {
@@ -106,7 +100,8 @@ public class AccountService {
                     /* Pedir el producto con un api */
                     String status = getAccountStatus(account.getStatus());
                     RSAccount rsAccount = RSAccount.builder()
-                            .codeAccount(account.getPk().getCodeLocalAccount())
+                            .codeLocalAccount(account.getPk().getCodeLocalAccount())
+                            .codeInternationalAccount(account.getPk().getCodeInternationalAccount())
                             .status(status)
                             .product("Sample")
                             .presentBalance(account.getPresentBalance())
@@ -116,21 +111,103 @@ public class AccountService {
                 }
             });
         } catch (Exception e) {
-            throw new RSRuntimeException(this.INTERNAL_ERROR, RSCode.INTERNAL_ERROR_SERVER);
+            throw new RSRuntimeException(Messages.INTERNAL_ERROR, RSCode.INTERNAL_ERROR_SERVER);
         }
 
         return rsAccounts;
     }
 
     private String getAccountStatus(String status) {
-        if (status.equals(AccountStatusCode.ACTIVATE.code)) {
-            return AccountStatusCode.ACTIVATE.name;
-        } else if (status.equals(AccountStatusCode.BLOCKED.code)) {
-            return AccountStatusCode.BLOCKED.name;
-        } else if (status.equals(AccountStatusCode.SUSPEND.code)) {
-            return AccountStatusCode.SUSPEND.name;
+        if (status.equals(Status.ACTIVATE.code)) {
+            return Status.ACTIVATE.name;
+        } else if (status.equals(Status.BLOCKED.code)) {
+            return Status.BLOCKED.name;
+        } else if (status.equals(Status.SUSPEND.code)) {
+            return Status.SUSPEND.name;
         } else {
             return null;
+        }
+    }
+
+    public Account findAccountByCode(String codeLocalAccount, String codeInternationalAccount){
+        Optional<Account> opAccount = accountRepository.findById(
+                AccountPK.builder()
+                        .codeLocalAccount(codeLocalAccount)
+                        .codeInternationalAccount(codeInternationalAccount)
+                        .build()
+        );
+
+        if(!opAccount.isPresent()){
+            throw new RSRuntimeException(Messages.NOT_FOUND_ACCOUNTS_FOR_CODE, RSCode.NOT_FOUND);
+        }
+
+        return opAccount.get();
+    }
+
+
+    public void updateAccountStatus(String codeLocalAccount, String codeInternationalAccount, String status){
+
+        Optional<Account> opAccount = accountRepository.findById(
+                AccountPK.builder()
+                        .codeLocalAccount(codeLocalAccount)
+                        .codeInternationalAccount(codeInternationalAccount)
+                        .build()
+        );
+
+        if(!opAccount.isPresent()){
+            throw new RSRuntimeException(Messages.NOT_FOUND_ACCOUNTS_FOR_CODE, RSCode.NOT_FOUND);
+        }
+
+        Account account = opAccount.get();
+
+        account.setStatus(status);
+
+        List<AccountAssociatedService> services = accountAssociatedServiceRepository.
+                findByPkCodeLocalAccountAndPkCodeInternationalAccount(codeLocalAccount,codeInternationalAccount);
+
+        if(services.size() > 0){
+            if(status.equals("BLO")||status.equals("SUS")||status.equals("INA")){
+                for(AccountAssociatedService service: services){
+                    service.setStatus(status);
+                    try {
+                        this.accountAssociatedServiceRepository.save(service);
+                    } catch (Exception e) {
+                        throw new RSRuntimeException(Messages.SERVICE_NOT_UPDATED, RSCode.INTERNAL_ERROR_SERVER);
+                    }
+                }
+            }
+        }
+
+        try {
+            this.accountRepository.save(account);
+        } catch (Exception e) {
+            throw new RSRuntimeException(Messages.ACCOUNT_NOT_UPDATED, RSCode.INTERNAL_ERROR_SERVER);
+        }
+    }
+
+    public void updateAccountBalance(String codeLocalAccount, String codeInternationalAccount,
+                                     BigDecimal presentBalance,BigDecimal availableBalance){
+
+        Optional<Account> opAccount = accountRepository.findById(
+                AccountPK.builder()
+                        .codeLocalAccount(codeLocalAccount)
+                        .codeInternationalAccount(codeInternationalAccount)
+                        .build()
+        );
+
+        if(!opAccount.isPresent()){
+            throw new RSRuntimeException(Messages.NOT_FOUND_ACCOUNTS_FOR_CODE, RSCode.NOT_FOUND);
+        }
+
+        Account account = opAccount.get();
+
+        account.setAvailableBalance(availableBalance);
+        account.setPresentBalance(presentBalance);
+
+        try {
+            this.accountRepository.save(account);
+        } catch (Exception e) {
+            throw new RSRuntimeException(Messages.ACCOUNT_NOT_UPDATED, RSCode.INTERNAL_ERROR_SERVER);
         }
     }
 }

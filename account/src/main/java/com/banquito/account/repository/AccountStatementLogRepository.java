@@ -11,5 +11,5 @@ import com.banquito.account.model.AccountStatementLogPK;
 @Repository
 public interface AccountStatementLogRepository extends JpaRepository<AccountStatementLog, AccountStatementLogPK> {
     public Optional<AccountStatementLog> findTopByOrderByLastCutOffDateDesc();
-    public Optional<AccountStatementLog> findTopByOrderByPkActualCutOffDateDesc();
+    public Optional<AccountStatementLog> findTopByOrderByCurrentCutOffDateDesc();
 }

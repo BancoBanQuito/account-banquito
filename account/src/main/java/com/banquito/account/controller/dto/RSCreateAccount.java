@@ -8,6 +8,7 @@ import lombok.Data;
 @Data
 @Builder
 public class RSCreateAccount implements Serializable {
-    private String codelocalaccount;
-    private String codeinternationalaccount;
+    private String codeLocalAccount;
+
+    private String codeInternationalAccount;
 }
