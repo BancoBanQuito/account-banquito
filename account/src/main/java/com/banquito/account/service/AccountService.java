@@ -100,7 +100,8 @@ public class AccountService {
                     /* Pedir el producto con un api */
                     String status = getAccountStatus(account.getStatus());
                     RSAccount rsAccount = RSAccount.builder()
-                            .codeAccount(account.getPk().getCodeLocalAccount())
+                            .codeLocalAccount(account.getPk().getCodeLocalAccount())
+                            .codeInternationalAccount(account.getPk().getCodeInternationalAccount())
                             .status(status)
                             .product("Sample")
                             .presentBalance(account.getPresentBalance())
@@ -127,6 +128,22 @@ public class AccountService {
             return null;
         }
     }
+
+    public Account findAccountByCode(String codeLocalAccount, String codeInternationalAccount){
+        Optional<Account> opAccount = accountRepository.findById(
+                AccountPK.builder()
+                        .codeLocalAccount(codeLocalAccount)
+                        .codeInternationalAccount(codeInternationalAccount)
+                        .build()
+        );
+
+        if(!opAccount.isPresent()){
+            throw new RSRuntimeException(Messages.NOT_FOUND_ACCOUNTS_FOR_CODE, RSCode.NOT_FOUND);
+        }
+
+        return opAccount.get();
+    }
+
 
     public void updateAccountStatus(String codeLocalAccount, String codeInternationalAccount, String status){
 

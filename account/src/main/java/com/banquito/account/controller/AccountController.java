@@ -41,7 +41,7 @@ public class AccountController {
         }
     }
 
-    @GetMapping(value = "/{identificationType}/{identification}")
+    @GetMapping(value = "/id/{identificationType}/{identification}")
     public ResponseEntity<RSFormat> getConsolidateAccounts(
         @PathVariable("identificationType") String identificationType,
         @PathVariable("identification") String identification) {
@@ -57,6 +57,31 @@ public class AccountController {
         } catch (Exception e) {
             return ResponseEntity.status(500)
                         .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
+        }
+    }
+
+    @GetMapping(value = "/code/{codeLocalAccount}/{codeInternationalAccount}")
+    public ResponseEntity<RSFormat> getAccountbyCode(
+            @PathVariable("codeLocalAccount") String codeLocalAccount,
+            @PathVariable("codeInternationalAccount") String codeInternationalAccount){
+        try {
+
+            if (Utils.isNullEmpty(codeLocalAccount) || Utils.isNullEmpty(codeInternationalAccount)) {
+                throw new RSRuntimeException(Messages.MISSING_PARAMS, RSCode.BAD_REQUEST);
+            }
+
+            Account account = accountService.findAccountByCode(codeLocalAccount,codeInternationalAccount);
+
+            return ResponseEntity.status(RSCode.SUCCESS.code).
+                    body(RSFormat.builder().message("Success").data(AccountMapper.mapAccount(account)).build());
+
+        } catch (RSRuntimeException e) {
+            return ResponseEntity.status(e.getCode())
+                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
         }
     }
 

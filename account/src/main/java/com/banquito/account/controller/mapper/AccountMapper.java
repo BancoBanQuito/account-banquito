@@ -26,7 +26,10 @@ public class AccountMapper {
 
     public static RSAccount mapAccount(Account account) {
         return RSAccount.builder()
-                .codeAccount(account.getPk().getCodeLocalAccount())
+                .codeLocalAccount(account.getPk().getCodeLocalAccount())
+                .codeInternationalAccount(account.getPk().getCodeInternationalAccount())
+                .product(account.getCodeProduct())
+                .status(account.getStatus())
                 .presentBalance(account.getPresentBalance())
                 .availableBalance(account.getAvailableBalance())
                 .build();
