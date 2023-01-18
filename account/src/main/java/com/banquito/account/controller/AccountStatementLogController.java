@@ -1,5 +1,7 @@
 package com.banquito.account.controller;
 
+import com.banquito.account.utils.Messages;
+import com.banquito.account.utils.Utils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +27,11 @@ public class AccountStatementLogController {
     @GetMapping("/{accountCode}")
     public ResponseEntity<RSFormat> findAccountStatement(@PathVariable("accountCode") String accountCode) {
         try {
+            if (Utils.isNullEmpty(accountCode)) {
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
+                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
+            }
+
             RSAccountStatement rsAccountStatement = this.accountStatementLogService.findAccountStatement(accountCode);
             return ResponseEntity.status(RSCode.SUCCESS.code)
                     .body(RSFormat.builder().message("Success").data(rsAccountStatement).build());
@@ -32,7 +39,7 @@ public class AccountStatementLogController {
             return ResponseEntity.status(e.getCode())
                     .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
         } catch (Exception e) {
-            return ResponseEntity.status(500)
+            return ResponseEntity.status(RSCode.INTERNAL_SERVER_ERROR.code)
                     .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
         }
     }

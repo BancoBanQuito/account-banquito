@@ -45,7 +45,7 @@ public class AccountSignatureService {
         try {
             this.accountSignatureRepository.save(accountSignature);
         } catch (Exception e) {
-            throw new RSRuntimeException(Messages.SIGNATURE_NOT_CREATED, RSCode.INTERNAL_ERROR_SERVER);
+            throw new RSRuntimeException(Messages.SIGNATURE_NOT_CREATED, RSCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -75,7 +75,7 @@ public class AccountSignatureService {
         try {
             this.accountSignatureRepository.save(accountSignature);
         } catch (Exception e) {
-            throw new RSRuntimeException(Messages.SIGNATURE_NOT_UPDATED, RSCode.INTERNAL_ERROR_SERVER);
+            throw new RSRuntimeException(Messages.SIGNATURE_NOT_UPDATED, RSCode.INTERNAL_SERVER_ERROR);
         }
     }
 

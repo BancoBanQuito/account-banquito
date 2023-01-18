@@ -42,7 +42,7 @@ public class AccountController {
                     .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
 
         } catch (Exception e) {
-            return ResponseEntity.status(500)
+            return ResponseEntity.status(RSCode.INTERNAL_SERVER_ERROR.code)
                     .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
         }
     }
@@ -67,7 +67,7 @@ public class AccountController {
                     .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
 
         } catch (Exception e) {
-            return ResponseEntity.status(500)
+            return ResponseEntity.status(RSCode.INTERNAL_SERVER_ERROR.code)
                     .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
         }
     }
@@ -118,7 +118,7 @@ public class AccountController {
                     .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
 
         } catch (Exception e) {
-            return ResponseEntity.status(500)
+            return ResponseEntity.status(RSCode.INTERNAL_SERVER_ERROR.code)
                     .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
         }
     }
@@ -147,7 +147,7 @@ public class AccountController {
                     .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
 
         } catch (Exception e) {
-            return ResponseEntity.status(500)
+            return ResponseEntity.status(RSCode.INTERNAL_SERVER_ERROR.code)
                     .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
         }
     }

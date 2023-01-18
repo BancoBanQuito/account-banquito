@@ -69,7 +69,7 @@ public class AccountService {
             this.accountRepository.save(account);
             this.accountClientRepository.save(accountClient);
         } catch (Exception e) {
-            throw new RSRuntimeException(Messages.ACCOUNT_NOT_CREATED, RSCode.INTERNAL_ERROR_SERVER);
+            throw new RSRuntimeException(Messages.ACCOUNT_NOT_CREATED, RSCode.INTERNAL_SERVER_ERROR);
         }
         return account;
     }
@@ -108,7 +108,7 @@ public class AccountService {
                 }
             });
         } catch (Exception e) {
-            throw new RSRuntimeException(Messages.INTERNAL_ERROR, RSCode.INTERNAL_ERROR_SERVER);
+            throw new RSRuntimeException(Messages.INTERNAL_ERROR, RSCode.INTERNAL_SERVER_ERROR);
         }
 
         return rsAccounts;
@@ -169,7 +169,7 @@ public class AccountService {
                     try {
                         this.accountAssociatedServiceRepository.save(service);
                     } catch (Exception e) {
-                        throw new RSRuntimeException(Messages.SERVICE_NOT_UPDATED, RSCode.INTERNAL_ERROR_SERVER);
+                        throw new RSRuntimeException(Messages.SERVICE_NOT_UPDATED, RSCode.INTERNAL_SERVER_ERROR);
                     }
                 }
             }
@@ -178,7 +178,7 @@ public class AccountService {
         try {
             this.accountRepository.save(account);
         } catch (Exception e) {
-            throw new RSRuntimeException(Messages.ACCOUNT_NOT_UPDATED, RSCode.INTERNAL_ERROR_SERVER);
+            throw new RSRuntimeException(Messages.ACCOUNT_NOT_UPDATED, RSCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -205,7 +205,7 @@ public class AccountService {
         try {
             this.accountRepository.save(account);
         } catch (Exception e) {
-            throw new RSRuntimeException(Messages.ACCOUNT_NOT_UPDATED, RSCode.INTERNAL_ERROR_SERVER);
+            throw new RSRuntimeException(Messages.ACCOUNT_NOT_UPDATED, RSCode.INTERNAL_SERVER_ERROR);
         }
     }
 }
