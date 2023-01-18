@@ -61,7 +61,7 @@ public class AccountController {
     }
 
     @GetMapping(value = "/code/{codeLocalAccount}/{codeInternationalAccount}")
-    public ResponseEntity<RSFormat> getAccountbyCode(
+    public ResponseEntity<RSFormat> getAccountByCode(
             @PathVariable("codeLocalAccount") String codeLocalAccount,
             @PathVariable("codeInternationalAccount") String codeInternationalAccount){
         try {
@@ -85,7 +85,7 @@ public class AccountController {
         }
     }
 
-    @PutMapping(value = "/{codeLocalAccount}/{codeInternationalAccount}/status")
+    @PutMapping(value = "/code/{codeLocalAccount}/{codeInternationalAccount}/status")
     public ResponseEntity<RSFormat> updateAccountStatus(
             @PathVariable("codeLocalAccount") String codeLocalAccount,
             @PathVariable("codeInternationalAccount") String codeInternationalAccount,
@@ -108,4 +108,33 @@ public class AccountController {
                     .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
         }
     }
+
+
+    @PutMapping(value = "/code/{codeLocalAccount}/{codeInternationalAccount}/balance")
+    public ResponseEntity<RSFormat> updateAccountBalance(
+            @PathVariable("codeLocalAccount") String codeLocalAccount,
+            @PathVariable("codeInternationalAccount") String codeInternationalAccount,
+            @RequestBody RQAccountBalance balance) {
+        try {
+            if (!Utils.hasAllAttributes(balance) || Utils.isNullEmpty(codeLocalAccount) || Utils.isNullEmpty(codeInternationalAccount)) {
+                throw new RSRuntimeException(Messages.MISSING_PARAMS, RSCode.BAD_REQUEST);
+            }
+            accountService.updateAccountBalance(
+                    codeLocalAccount,
+                    codeInternationalAccount,
+                    balance.getPresentBalance(),
+                    balance.getAvailableBalance());
+            return ResponseEntity.status(RSCode.CREATED.code)
+                    .body(RSFormat.builder().message("Success").data(Messages.ACCOUNT_UPDATED).build());
+
+        } catch (RSRuntimeException e) {
+            return ResponseEntity.status(e.getCode())
+                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
+        }
+    }
+
 }

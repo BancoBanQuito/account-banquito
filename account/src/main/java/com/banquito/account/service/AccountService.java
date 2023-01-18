@@ -183,6 +183,31 @@ public class AccountService {
         } catch (Exception e) {
             throw new RSRuntimeException(Messages.ACCOUNT_NOT_UPDATED, RSCode.INTERNAL_ERROR_SERVER);
         }
+    }
 
+    public void updateAccountBalance(String codeLocalAccount, String codeInternationalAccount,
+                                     BigDecimal presentBalance,BigDecimal availableBalance){
+
+        Optional<Account> opAccount = accountRepository.findById(
+                AccountPK.builder()
+                        .codeLocalAccount(codeLocalAccount)
+                        .codeInternationalAccount(codeInternationalAccount)
+                        .build()
+        );
+
+        if(!opAccount.isPresent()){
+            throw new RSRuntimeException(Messages.NOT_FOUND_ACCOUNTS_FOR_CODE, RSCode.NOT_FOUND);
+        }
+
+        Account account = opAccount.get();
+
+        account.setAvailableBalance(availableBalance);
+        account.setPresentBalance(presentBalance);
+
+        try {
+            this.accountRepository.save(account);
+        } catch (Exception e) {
+            throw new RSRuntimeException(Messages.ACCOUNT_NOT_UPDATED, RSCode.INTERNAL_ERROR_SERVER);
+        }
     }
 }
