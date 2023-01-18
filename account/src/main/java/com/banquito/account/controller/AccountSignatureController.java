@@ -31,7 +31,8 @@ public class AccountSignatureController {
     public ResponseEntity<RSFormat> createSignature(@RequestBody RQSignature signature) {
         try {
             if(!Utils.hasAllAttributes(signature)){
-                throw new RSRuntimeException(Messages.MISSING_PARAMS, RSCode.BAD_REQUEST);
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
+                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
             }
             accountSignatureService.createSignature(AccountSignatureMapper.map(signature));
             return ResponseEntity.status(RSCode.CREATED.code)
@@ -53,6 +54,10 @@ public class AccountSignatureController {
             @PathVariable("identification") String identification
             ){
         try {
+            if(Utils.isNullEmpty(identificationType) || Utils.isNullEmpty(identification)){
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
+                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
+            }
             List<RSSignature> signatures = accountSignatureService.findSignatures(identificationType, identification);
             return ResponseEntity.status(RSCode.CREATED.code)
                     .body(RSFormat.builder().message("Success").data(signatures).build());
@@ -86,7 +91,8 @@ public class AccountSignatureController {
                     .build();
 
             if(!Utils.hasAllAttributes(signature)){
-                throw new RSRuntimeException(Messages.MISSING_PARAMS, RSCode.BAD_REQUEST);
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
+                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
             }
 
             accountSignatureService.updateSignatureRoleStatus(signature);

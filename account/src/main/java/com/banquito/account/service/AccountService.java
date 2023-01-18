@@ -39,9 +39,6 @@ public class AccountService {
 
     @Transactional
     public Account createAccount(Account account, String identification, String identificationType) {
-        if (identification.isEmpty() || identificationType.isEmpty() || account.equals(null)) {
-            throw new RSRuntimeException(Messages.MISSING_PARAMS, RSCode.NOT_FOUND);
-        }
 
         String localAccountCode = Utils.generateNumberCode(20);
         String internationalAccountCode = Utils.generateNumberCode(34);
@@ -85,7 +82,7 @@ public class AccountService {
                 .findByPkIdentificationAndPkIdentificationType(identification, identificationType);
         log.info("" + accountClients.size());
         if (accountClients.size() < 1) {
-            throw new RSRuntimeException(Messages.NOT_FOUND_ACCOUNTS_FOR_CLIENT, RSCode.NOT_FOUND);
+            throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CLIENT, RSCode.NOT_FOUND);
         }
 
         try {
@@ -138,13 +135,13 @@ public class AccountService {
         );
 
         if(!opAccount.isPresent()){
-            throw new RSRuntimeException(Messages.NOT_FOUND_ACCOUNTS_FOR_CODE, RSCode.NOT_FOUND);
+            throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
         }
 
         return opAccount.get();
     }
 
-
+    @Transactional
     public void updateAccountStatus(String codeLocalAccount, String codeInternationalAccount, String status){
 
         Optional<Account> opAccount = accountRepository.findById(
@@ -155,7 +152,7 @@ public class AccountService {
         );
 
         if(!opAccount.isPresent()){
-            throw new RSRuntimeException(Messages.NOT_FOUND_ACCOUNTS_FOR_CODE, RSCode.NOT_FOUND);
+            throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
         }
 
         Account account = opAccount.get();
@@ -185,6 +182,7 @@ public class AccountService {
         }
     }
 
+    @Transactional
     public void updateAccountBalance(String codeLocalAccount, String codeInternationalAccount,
                                      BigDecimal presentBalance,BigDecimal availableBalance){
 
@@ -196,7 +194,7 @@ public class AccountService {
         );
 
         if(!opAccount.isPresent()){
-            throw new RSRuntimeException(Messages.NOT_FOUND_ACCOUNTS_FOR_CODE, RSCode.NOT_FOUND);
+            throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
         }
 
         Account account = opAccount.get();

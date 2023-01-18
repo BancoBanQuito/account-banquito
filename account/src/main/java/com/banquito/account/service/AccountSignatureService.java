@@ -64,7 +64,7 @@ public class AccountSignatureService {
 
         //verified record exist
         if(!opAccountSignature.isPresent()){
-            throw new RSRuntimeException(Messages.NOT_FOUND_ACCOUNTS_FOR_CODE, RSCode.NOT_FOUND);
+            throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
         }
 
         AccountSignature accountSignature = opAccountSignature.get();
@@ -90,7 +90,7 @@ public class AccountSignatureService {
                 findByPkIdentificationTypeAndPkIdentification(identificationType, identification);
 
         if(dbSignatures.size() < 1){
-            throw new RSRuntimeException(Messages.NOT_FOUND_ACCOUNTS_FOR_CLIENT, RSCode.NOT_FOUND);
+            throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CLIENT, RSCode.NOT_FOUND);
         }
 
         //Call api for client name TODO
