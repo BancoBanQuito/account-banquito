@@ -133,4 +133,22 @@ public class AccountService {
             return null;
         }
     }
+
+    public void updateAccount(String codeAccount, BigDecimal presentBalance, BigDecimal availableBalance) {
+        Optional<Account> optAccount = this.accountRepository
+                .findByPkCodeLocalAccountOrPkCodeInternationalAccount(codeAccount, codeAccount);
+        if (optAccount.isPresent()) {
+            Account account = optAccount.get();
+            account.setPresentBalance(presentBalance);
+            account.setAvailableBalance(availableBalance);
+            account.setLastUpdateDate(new Date());
+            try {
+                this.accountRepository.save(account);
+            } catch (Exception e) {
+                throw new RSRuntimeException(this.INTERNAL_ERROR, RSCode.INTERNAL_ERROR_SERVER);
+            }
+        } else {
+            throw new RSRuntimeException(this.NOT_FOUND_ACCOUNTS, RSCode.NOT_FOUND);
+        }
+    }
 }

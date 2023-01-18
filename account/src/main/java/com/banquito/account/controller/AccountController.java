@@ -2,6 +2,7 @@ package com.banquito.account.controller;
 
 import com.banquito.account.config.RSCode;
 import com.banquito.account.config.ResponseFormat;
+import com.banquito.account.controller.dto.RQBalanceUpdate;
 import com.banquito.account.controller.dto.RQCreateAccount;
 import com.banquito.account.controller.dto.RSAccount;
 import com.banquito.account.controller.dto.RSCreateAccount;
@@ -47,6 +48,23 @@ public class AccountController {
         try {
             List<RSAccount> rsAccounts = this.accountService.findAllAccountsByClient(identificationType, identification);
             return ResponseEntity.status(RSCode.SUCCESS.code).body(ResponseFormat.builder().message("Success").data(rsAccounts).build());
+        } catch (RSRuntimeException e) {
+            return ResponseEntity.status(e.getCode())
+                        .body(ResponseFormat.builder().message("Failure").data(e.getMessage()).build());
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                        .body(ResponseFormat.builder().message("Failure").data(e.getMessage()).build());
+        }
+    }
+
+    @PutMapping("/{accountCode}")
+    public ResponseEntity<ResponseFormat> updateAccount(
+        @PathVariable("accountCode") String accountCode, 
+        @RequestBody RQBalanceUpdate rqBalance){
+        try {
+            this.accountService.updateAccount(accountCode, rqBalance.getPresentBalance(), rqBalance.getAvailableBalance());
+            return ResponseEntity.status(RSCode.SUCCESS.code)
+                        .body(ResponseFormat.builder().message("Failure").data(null).build());
         } catch (RSRuntimeException e) {
             return ResponseEntity.status(e.getCode())
                         .body(ResponseFormat.builder().message("Failure").data(e.getMessage()).build());
