@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.banquito.account.utils.RSCode;
-import com.banquito.account.utils.ResponseFormat;
+import com.banquito.account.utils.RSFormat;
 import com.banquito.account.controller.dto.RSAccountStatement;
 import com.banquito.account.exception.RSRuntimeException;
 import com.banquito.account.service.AccountStatementLogService;
@@ -23,17 +23,17 @@ public class AccountStatementLogController {
     }
 
     @GetMapping("/{accountCode}")
-    public ResponseEntity<ResponseFormat> findAccountStatement(@PathVariable("accountCode") String accountCode) {
+    public ResponseEntity<RSFormat> findAccountStatement(@PathVariable("accountCode") String accountCode) {
         try {
             RSAccountStatement rsAccountStatement = this.accountStatementLogService.findAccountStatement(accountCode);
             return ResponseEntity.status(RSCode.SUCCESS.code)
-                    .body(ResponseFormat.builder().message("Success").data(rsAccountStatement).build());
+                    .body(RSFormat.builder().message("Success").data(rsAccountStatement).build());
         } catch (RSRuntimeException e) {
             return ResponseEntity.status(e.getCode())
-                    .body(ResponseFormat.builder().message("Failure").data(e.getMessage()).build());
+                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
         } catch (Exception e) {
             return ResponseEntity.status(500)
-                    .body(ResponseFormat.builder().message("Failure").data(e.getMessage()).build());
+                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
         }
     }
 

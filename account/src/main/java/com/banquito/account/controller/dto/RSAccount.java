@@ -10,8 +10,12 @@ import lombok.Data;
 @Builder
 public class RSAccount implements Serializable {
     private String codeAccount;
+
     private String status;
+
     private String product;
+
     private BigDecimal presentBalance;
+
     private BigDecimal availableBalance;
 }

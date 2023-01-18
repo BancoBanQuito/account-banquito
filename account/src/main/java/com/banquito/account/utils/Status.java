@@ -1,15 +1,16 @@
 package com.banquito.account.utils;
 
-public enum AccountStatusCode {
+public enum Status {
 
     ACTIVATE("ACT", "ACTIVO"),
-    BLOCKED("BLO", "BLOQUEADA"),
-    SUSPEND("SUS", "SUSPENDIDO");
+    BLOCKED("BLO", "BLOQUEADO"),
+    SUSPEND("SUS", "SUSPENDIDO"),
+    INACTIVE("INA", "INACTIVO");
 
     public final String code;
     public final String name;
 
-    AccountStatusCode(String code, String name) {
+    Status(String code, String name) {
         this.code = code;
         this.name = name;
     }

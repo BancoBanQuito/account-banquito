@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.banquito.account.utils.Utils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import com.banquito.account.utils.RSCode;
@@ -22,6 +23,7 @@ import com.banquito.account.repository.AccountStatementLogRepository;
 
 import jakarta.transaction.Transactional;
 
+@Slf4j
 @Service
 public class AccountStatementLogService {
 

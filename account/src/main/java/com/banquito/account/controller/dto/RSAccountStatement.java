@@ -8,8 +8,8 @@ import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 
-@Builder
 @Data
+@Builder
 public class RSAccountStatement implements Serializable {
     private String fullname;
     private String accountCode;

@@ -1,5 +1,6 @@
 package com.banquito.account.model;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,9 @@ import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Embeddable
 public class AccountSignaturePK implements Serializable{
 

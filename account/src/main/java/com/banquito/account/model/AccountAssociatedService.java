@@ -16,21 +16,21 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "ACCOUNT_ASSOCIATED_SERVICE")
+@Table(name = "account_associated_service")
 public class AccountAssociatedService implements Serializable {
 
 	@EmbeddedId
 	@Include
 	private AccountAssociatedServicePK pk;
 
-	@Column(name = "STATUS", length = 3, nullable = false)
+	@Column(name = "status", length = 3, nullable = false)
 	private String status;
 
-	@Column(name = "START_DATE", nullable = false)
+	@Column(name = "start_date", nullable = false)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date startDate;
 
-	@Column(name = "END_DATE", nullable = true)
+	@Column(name = "end_date", nullable = true)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date endDate;
 
