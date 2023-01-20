@@ -80,10 +80,6 @@ public class AccountSignatureService {
     }
 
     public List<RSSignature> findSignatures(String identificationType, String identification){
-        //validate data
-        if(Utils.isNullEmpty(identificationType) || Utils.isNullEmpty(identification)){
-            throw new RSRuntimeException(Messages.MISSING_PARAMS, RSCode.BAD_REQUEST);
-        }
 
         //get requested record
         List<AccountSignature> dbSignatures = accountSignatureRepository.

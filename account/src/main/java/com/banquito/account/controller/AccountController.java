@@ -1,6 +1,7 @@
 package com.banquito.account.controller;
 
 import com.banquito.account.controller.dto.*;
+import com.banquito.account.request.TransactionRequest;
 import com.banquito.account.utils.Messages;
 import com.banquito.account.utils.RSCode;
 import com.banquito.account.utils.RSFormat;
@@ -12,6 +13,7 @@ import com.banquito.account.utils.Utils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -21,6 +23,14 @@ public class AccountController {
 
     public AccountController(AccountService accountService) {
         this.accountService = accountService;
+    }
+
+    //This method is only used for development purposes
+    @GetMapping(value = "/test")
+    public Object test(){
+         return TransactionRequest.getTransactions("dfd4f80f8f90f1136512",
+                "2023-01-10T22:47:02.6401231",
+                "2023-01-22T22:47:02.6401231");
     }
 
     @PostMapping
