@@ -24,6 +24,12 @@ public class AccountStatementLogController {
         this.accountStatementLogService = accountStatementLogService;
     }
 
+    //This method is only used for development purposes
+    @GetMapping(value = "/test")
+    public Object test(){
+        return accountStatementLogService.test();
+    }
+
     @GetMapping("/{codeLocalAccount}/{codeInternationalAccount}")
     public ResponseEntity<RSFormat> findAccountStatement(
             @PathVariable("codeLocalAccount") String codeLocalAccount,

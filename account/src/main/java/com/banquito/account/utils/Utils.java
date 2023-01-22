@@ -5,8 +5,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -69,8 +67,8 @@ public class Utils {
     public static boolean saveLog(Object object, String codeLocalAccount){
         try {
             String date = currentDateTime().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-            String filename = date + codeLocalAccount + ".txt";
-            File file = new File("log/"+filename);
+            String filename = date + "_" +codeLocalAccount + ".txt";
+            File file = new File("../log/"+filename);
             FileWriter fw = new FileWriter(file);
             PrintWriter pw = new PrintWriter(fw);
 

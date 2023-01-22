@@ -40,6 +40,13 @@ public class AccountStatementLogService {
         this.accountRepository = accountRepository;
     }
 
+    //The  test service is only used for development purposes
+    public Object test(){
+        List<AccountStatementLog> list = accountStatementLogRepository.findByPkCodeLocalAccountOrderByCurrentCutOffDateDesc("22cf89573e25a91bffbb");
+
+        return list.get(0).getCurrentCutOffDate();
+    }
+
     public RSAccountStatement findAccountStatement(String codeLocalAccount, String codeInternationalAccount) {
 
         AccountPK pk = new AccountPK();
@@ -76,6 +83,13 @@ public class AccountStatementLogService {
 
         accountStatement.setTransactions(statementTransactions);
 
+        try {
+            this.accountStatementLogRepository.save(accountStatementLog);
+
+        } catch (Exception e) {
+            throw new RSRuntimeException(Messages.STATEMENT_NOT_CREATED, RSCode.INTERNAL_SERVER_ERROR);
+        }
+
         return accountStatement;
     }
 
@@ -94,7 +108,7 @@ public class AccountStatementLogService {
         BigDecimal tempAverageBalance = BigDecimal.valueOf(0);
 
 
-        List<AccountStatementLog> logs = accountStatementLogRepository.findByPkCodeLocalAccountOrderByCurrentCutOffDate(
+        List<AccountStatementLog> logs = accountStatementLogRepository.findByPkCodeLocalAccountOrderByCurrentCutOffDateDesc(
                 account.getPk().getCodeLocalAccount()
         );
 

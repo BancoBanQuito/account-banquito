@@ -78,6 +78,10 @@ public class ScheduledTasks {
 
         for (Account account : accounts) {
 
+            if(!account.getStatus().equals("ACT")){
+                continue;
+            }
+
             RQInterest interest = RQInterest.builder()
                     .codeLocalAccount(account.getPk().getCodeLocalAccount())
                     .codeInternationalAccount(account.getPk().getCodeInternationalAccount())

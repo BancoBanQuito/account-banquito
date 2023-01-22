@@ -11,5 +11,5 @@ import com.banquito.account.model.AccountStatementLogPK;
 
 @Repository
 public interface AccountStatementLogRepository extends JpaRepository<AccountStatementLog, AccountStatementLogPK> {
-    public List<AccountStatementLog> findByPkCodeLocalAccountOrderByCurrentCutOffDate(String localCodeAccount);
+    public List<AccountStatementLog> findByPkCodeLocalAccountOrderByCurrentCutOffDateDesc(String localCodeAccount);
 }

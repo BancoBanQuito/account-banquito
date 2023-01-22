@@ -6,6 +6,11 @@ import com.banquito.account.model.*;
 import com.banquito.account.repository.AccountAssociatedServiceRepository;
 import com.banquito.account.repository.AccountClientRepository;
 import com.banquito.account.repository.AccountRepository;
+import com.banquito.account.request.TransactionRequest;
+import com.banquito.account.request.dto.RQInterest;
+import com.banquito.account.request.dto.RQTransaction;
+import com.banquito.account.request.dto.RSInterest;
+import com.banquito.account.request.dto.RSTransaction;
 import com.banquito.account.utils.Messages;
 import com.banquito.account.utils.RSCode;
 import com.banquito.account.utils.Status;
@@ -36,8 +41,46 @@ public class AccountService {
     }
 
     //The  test service is only used for development purposes
-    public Object test(){
-        return accountRepository.findByCodeProductAndCodeProductType("89e47dfa71b983acb3c20e31b44ff652","239368d97b07f1459ae208d520d3db27");
+    public Object test() {
+        List<Account> accounts = accountRepository.findByCodeProductAndCodeProductType(
+                "aed99062a63c327876956943ae41dd36", "239368d97b07f1459ae208d520d3db27");
+
+        for (Account account : accounts) {
+
+            if(!account.getStatus().equals("ACT")){
+                continue;
+            }
+
+            RQInterest interest = RQInterest.builder()
+                    .codeLocalAccount(account.getPk().getCodeLocalAccount())
+                    .codeInternationalAccount(account.getPk().getCodeInternationalAccount())
+                    .ear(BigDecimal.valueOf(5.75))
+                    .availableBalance(account.getAvailableBalance())
+                    .build();
+
+            RSInterest responseInterest = TransactionRequest.createSavingsAccountInterest(interest);
+
+            if (responseInterest != null) {
+                Utils.saveLog(responseInterest, account.getPk().getCodeLocalAccount());
+
+                RQTransaction transaction = RQTransaction.builder()
+                        .movement("NOTA CREDITO")
+                        .type("INTERES")
+                        .codeLocalAccount(account.getPk().getCodeLocalAccount())
+                        .codeInternationalAccount(account.getPk().getCodeInternationalAccount())
+                        .concept("Calculo interes, cuenta de ahorros GANA DIARIO")
+                        .value(responseInterest.getValue())
+                        .build();
+
+                RSTransaction responseTransaction = TransactionRequest.createTransaction(transaction);
+
+                if(responseTransaction != null){
+                    Utils.saveLog(responseTransaction, account.getPk().getCodeLocalAccount());
+                }
+            }
+        }
+
+        return "DONE";
     }
 
     @Transactional

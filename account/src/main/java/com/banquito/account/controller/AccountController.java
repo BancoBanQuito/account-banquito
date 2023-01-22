@@ -71,7 +71,7 @@ public class AccountController {
                 BigDecimal.valueOf(20000),
                 BigDecimal.valueOf(2.52));*/
 
-        return "Hello";
+        return accountService.test();
     }
 
     @PostMapping
