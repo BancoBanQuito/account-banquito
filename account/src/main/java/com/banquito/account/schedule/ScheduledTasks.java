@@ -159,7 +159,7 @@ public class ScheduledTasks {
 
                 if(dailyBalances.size() > 0){
                     for(RSInterest dailyBalance: dailyBalances){
-                        interest.add(dailyBalance.getValue());
+                        interest = interest.add(dailyBalance.getValue());
                     }
                 }
 

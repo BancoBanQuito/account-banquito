@@ -1,27 +1,23 @@
 package com.banquito.account.service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
+import com.banquito.account.controller.dto.RSAccount;
+import com.banquito.account.exception.RSRuntimeException;
 import com.banquito.account.model.*;
 import com.banquito.account.repository.AccountAssociatedServiceRepository;
+import com.banquito.account.repository.AccountClientRepository;
+import com.banquito.account.repository.AccountRepository;
 import com.banquito.account.utils.Messages;
-import lombok.Data;
+import com.banquito.account.utils.RSCode;
+import com.banquito.account.utils.Status;
+import com.banquito.account.utils.Utils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.banquito.account.utils.Utils;
-import com.banquito.account.utils.Status;
-import com.banquito.account.utils.RSCode;
-import com.banquito.account.controller.dto.RSAccount;
-import com.banquito.account.exception.RSRuntimeException;
-import com.banquito.account.repository.AccountClientRepository;
-import com.banquito.account.repository.AccountRepository;
-
-import lombok.extern.slf4j.Slf4j;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service

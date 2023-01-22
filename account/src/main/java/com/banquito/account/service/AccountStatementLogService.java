@@ -123,22 +123,22 @@ public class AccountStatementLogService {
         if(transactions.size() > 0){
             for(RSTransaction transaction: transactions){
                 if(transaction.getMovement().equals("NOTA DEBITO")){
-                    debit.add(transaction.getValue());
+                    debit = debit.add(transaction.getValue());
                 }
 
                 if(transaction.getMovement().equals("NOTA CREDITO")) {
-                    credit.add(transaction.getValue());
+                    credit = credit.add(transaction.getValue());
                 }
 
                 if(transaction.getType().equals("INTERES")){
-                    interest.add(transaction.getValue());
+                    interest = interest.add(transaction.getValue());
                 }
             }
         }
 
         if(dailyBalances.size() > 0){
             for(RSInterest dailyBalance: dailyBalances){
-                tempAverageBalance.add(dailyBalance.getAvailableBalance());
+                tempAverageBalance = tempAverageBalance.add(dailyBalance.getAvailableBalance());
             }
         }
 
