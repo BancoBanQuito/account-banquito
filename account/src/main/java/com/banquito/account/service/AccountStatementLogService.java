@@ -1,6 +1,7 @@
 package com.banquito.account.service;
 
 import com.banquito.account.controller.dto.RSAccountStatement;
+import com.banquito.account.controller.dto.RSAccountStatementList;
 import com.banquito.account.controller.dto.RSAccountStatementTransactions;
 import com.banquito.account.controller.mapper.AccountStatementMapper;
 import com.banquito.account.exception.RSRuntimeException;
@@ -41,7 +42,7 @@ public class AccountStatementLogService {
         this.accountRepository = accountRepository;
     }
 
-    public RSAccountStatement findAccountStatement(String codeLocalAccount, String codeInternationalAccount) {
+    public RSAccountStatement findCurrentAccountStatement(String codeLocalAccount, String codeInternationalAccount) {
 
         AccountPK pk = new AccountPK();
         pk.setCodeLocalAccount(codeLocalAccount);
@@ -55,13 +56,52 @@ public class AccountStatementLogService {
 
         Account account = opAccount.get();
 
-        AccountStatementLog accountStatementLog = getAccountStatement(account);
+        AccountStatementLog accountStatementLog = computeAccountStatement(account);
         RSAccountStatement accountStatement = AccountStatementMapper.map(accountStatementLog);
+
+        return findAccountStatementTransactions(accountStatementLog, accountStatement);
+    }
+
+    public List<RSAccountStatementList> findAccountStatementList(String codeLocalAccount, String codeInternationalAccount){
+
+        List<AccountStatementLog> dbAccountStatements = accountStatementLogRepository.findByPkCodeLocalAccountAndPkCodeInternationalAccount(
+                codeLocalAccount, codeInternationalAccount
+        );
+
+        List<RSAccountStatementList> accountStatements = new ArrayList<>();
+        RSAccountStatementList accountStatement;
+
+        for(AccountStatementLog dbAccountStatement: dbAccountStatements){
+            accountStatement = AccountStatementMapper.mapList(dbAccountStatement);
+            accountStatements.add(accountStatement);
+        }
+
+        return accountStatements;
+    }
+
+    public RSAccountStatement findHistoricAccountStatement(String codeAccountStateLog){
+
+        Optional<AccountStatementLog> opAccountStatementLog =
+                accountStatementLogRepository.findByPkCodeAccountStateLog(codeAccountStateLog);
+
+        if(!opAccountStatementLog.isPresent()){
+            throw new RSRuntimeException(Messages.STATEMENT_NOT_FOUND, RSCode.NOT_FOUND);
+        }
+
+        AccountStatementLog accountStatementLog = opAccountStatementLog.get();
+        RSAccountStatement accountStatement = AccountStatementMapper.map(accountStatementLog);
+
+        return findAccountStatementTransactions(accountStatementLog, accountStatement);
+    }
+
+    private RSAccountStatement findAccountStatementTransactions(AccountStatementLog accountStatementLog,
+                                                                       RSAccountStatement accountStatement){
+
         List<RSAccountStatementTransactions> statementTransactions = new ArrayList<>();
         RSAccountStatementTransactions statementTransaction;
 
         List<RSTransaction> transactions = TransactionRequest.getTransactionsBetweenDates(
-                account.getPk().getCodeLocalAccount(),
+                accountStatementLog.getPk().getCodeLocalAccount(),
                 LocalDateTime.ofInstant(accountStatementLog.getLastCutOffDate().toInstant(), ZoneId.systemDefault()),
                 LocalDateTime.ofInstant(accountStatementLog.getCurrentCutOffDate().toInstant(), ZoneId.systemDefault())
         );
@@ -88,7 +128,7 @@ public class AccountStatementLogService {
     }
 
 
-    public AccountStatementLog getAccountStatement(Account account) {
+    public AccountStatementLog computeAccountStatement(Account account) {
         Date tempLastCutOffDate;
         LocalDateTime lastCutOffDate;
         LocalDateTime currentCutOffDate = Utils.currentDateTime();

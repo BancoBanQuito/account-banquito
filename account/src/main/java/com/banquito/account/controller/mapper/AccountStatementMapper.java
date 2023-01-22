@@ -3,6 +3,7 @@ package com.banquito.account.controller.mapper;
 import java.util.List;
 
 import com.banquito.account.controller.dto.RSAccountStatement;
+import com.banquito.account.controller.dto.RSAccountStatementList;
 import com.banquito.account.controller.dto.RSAccountStatementTransactions;
 import com.banquito.account.model.AccountClient;
 import com.banquito.account.model.AccountStatementLog;
@@ -34,6 +35,18 @@ public class AccountStatementMapper {
                 .concept(transaction.getConcept())
                 .amount(transaction.getValue())
                 .balance(transaction.getAvailableBalance())
+                .build();
+    }
+
+    public static RSAccountStatementList mapList(AccountStatementLog accountStatementLog){
+
+        return RSAccountStatementList.builder()
+                .code(accountStatementLog.getPk().getCodeAccountStateLog())
+                .currentCutOffDate(accountStatementLog.getCurrentCutOffDate())
+                .credit(accountStatementLog.getCreditMovements())
+                .debit(accountStatementLog.getDebitMovements())
+                .balance(accountStatementLog.getCurrentBalance())
+                .interest(accountStatementLog.getInterest())
                 .build();
     }
 }

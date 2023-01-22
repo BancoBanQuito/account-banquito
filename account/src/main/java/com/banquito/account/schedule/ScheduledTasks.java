@@ -1,7 +1,5 @@
 package com.banquito.account.schedule;
 
-import com.banquito.account.controller.dto.RSAccountStatement;
-import com.banquito.account.exception.RSRuntimeException;
 import com.banquito.account.model.Account;
 import com.banquito.account.model.AccountStatementLog;
 import com.banquito.account.repository.AccountRepository;
@@ -9,9 +7,7 @@ import com.banquito.account.repository.AccountStatementLogRepository;
 import com.banquito.account.request.TransactionRequest;
 import com.banquito.account.request.dto.*;
 import com.banquito.account.service.AccountStatementLogService;
-import com.banquito.account.utils.Messages;
 import com.banquito.account.utils.Product;
-import com.banquito.account.utils.RSCode;
 import com.banquito.account.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,11 +19,9 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
-import java.util.Date;
 import java.util.List;
 
 @Component
@@ -115,7 +109,7 @@ public class ScheduledTasks {
 
     @Scheduled(cron = "0 55 23 * * *")
     public void standardSavingsInterest(){
-        //Cuentas de ahorro estandar, el interes se capitaliza al generar el estado de cuenta el dia 10 de cada mes
+        //Cuentas de ahorro estandar, el interes se capitaliza el ultimo dia del mes
         List<Account> accounts = accountRepository.findByCodeProductAndCodeProductType(
                 standardSavings.getCode(), standardSavings.getType());
 
@@ -309,7 +303,7 @@ public class ScheduledTasks {
                 continue;
             }
 
-            AccountStatementLog accountStatementLog = accountLogService.getAccountStatement(account);
+            AccountStatementLog accountStatementLog = accountLogService.computeAccountStatement(account);
 
             try {
                 this.accountLogRepository.save(accountStatementLog);
