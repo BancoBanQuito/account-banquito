@@ -12,24 +12,25 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RSTransaction implements Serializable {
-
-    private String codeUniqueTransaction;
+public class RQTransaction implements Serializable{
 
     private String movement;
 
+    private String type;
+
     private String codeLocalAccount;
+
+    private String codeInternationalAccount;
 
     private String concept;
 
-    private String type;
-
-    private String executeDate; //dont user LocalDateTime Jackson doesn't support it
+    private String description;
 
     private BigDecimal value;
 
-    private BigDecimal presentBalance;
+    private String recipientAccountNumber;
 
-    private BigDecimal availableBalance;
+    private String recipientBank;
 
+    private String recipientType;
 }

@@ -1,7 +1,15 @@
 package com.banquito.account.utils;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class Utils {
@@ -28,6 +36,10 @@ public class Utils {
         return new Date();
     }
 
+    public static LocalDateTime currentDateTime(){
+        return LocalDateTime.now();
+    }
+
     public static boolean hasAllAttributes(Object object){
         boolean result = true;
         Field[] fields = object.getClass().getDeclaredFields();
@@ -52,5 +64,26 @@ public class Utils {
 
     public static boolean isNullEmpty(Object value){
         return (value == null || value.toString().isEmpty());
+    }
+
+    public static boolean saveLog(Object object, String codeLocalAccount){
+        try {
+            String date = currentDateTime().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+            String filename = date + codeLocalAccount + ".txt";
+            File file = new File("log/"+filename);
+            FileWriter fw = new FileWriter(file);
+            PrintWriter pw = new PrintWriter(fw);
+
+            String[] messages = object.toString().split(",");
+
+            for(String message: messages){
+                pw.println(message);
+            }
+
+            pw.close();
+            return true;
+        }catch (IOException e)  {
+            return false;
+        }
     }
 }

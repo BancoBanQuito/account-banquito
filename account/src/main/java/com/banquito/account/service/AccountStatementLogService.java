@@ -1,109 +1,168 @@
 package com.banquito.account.service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
+import com.banquito.account.controller.dto.RSAccountStatement;
+import com.banquito.account.controller.dto.RSAccountStatementTransactions;
+import com.banquito.account.controller.mapper.AccountStatementMapper;
+import com.banquito.account.exception.RSRuntimeException;
+import com.banquito.account.model.Account;
+import com.banquito.account.model.AccountPK;
+import com.banquito.account.model.AccountStatementLog;
+import com.banquito.account.model.AccountStatementLogPK;
+import com.banquito.account.repository.AccountRepository;
+import com.banquito.account.repository.AccountStatementLogRepository;
+import com.banquito.account.request.TransactionRequest;
+import com.banquito.account.request.dto.RSInterest;
+import com.banquito.account.request.dto.RSTransaction;
+import com.banquito.account.utils.Messages;
+import com.banquito.account.utils.RSCode;
 import com.banquito.account.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import com.banquito.account.utils.RSCode;
-import com.banquito.account.controller.dto.RSAccountStatement;
-import com.banquito.account.controller.mapper.AccountStatementMapper;
-import com.banquito.account.exception.RSRuntimeException;
-import com.banquito.account.model.Account;
-import com.banquito.account.model.AccountClient;
-import com.banquito.account.model.AccountStatementLog;
-import com.banquito.account.model.AccountStatementLogPK;
-import com.banquito.account.repository.AccountClientRepository;
-import com.banquito.account.repository.AccountStatementLogRepository;
-
-import jakarta.transaction.Transactional;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
 public class AccountStatementLogService {
 
     private final AccountStatementLogRepository accountStatementLogRepository;
-    private final AccountClientRepository accountClientRepository;
-
-    private final String NOT_FOUND_ACCOUNT = "Cuenta no encontrada";
-    private final String NOT_FOUND_ACCOUNT_STATEMENT = "No existen estados de cuenta";
+    private final AccountRepository accountRepository;
 
     public AccountStatementLogService(AccountStatementLogRepository accountStatementLogRepository,
-            AccountClientRepository accountClientRepository) {
+            AccountRepository accountRepository) {
         this.accountStatementLogRepository = accountStatementLogRepository;
-        this.accountClientRepository = accountClientRepository;
+        this.accountRepository = accountRepository;
     }
 
-    public RSAccountStatement findAccountStatement(String accountCode) {
+    public RSAccountStatement findAccountStatement(String codeLocalAccount, String codeInternationalAccount) {
 
-        /* ----------------- Account Client ----------------- */
-        Optional<AccountClient> optionalAccountClient = this.accountClientRepository
-                .findByPkCodeLocalAccountOrPkCodeInternationalAccount(accountCode, accountCode);
-        if (!optionalAccountClient.isPresent()) {
-            throw new RSRuntimeException(this.NOT_FOUND_ACCOUNT, RSCode.NOT_FOUND);
+        AccountPK pk = new AccountPK();
+        pk.setCodeLocalAccount(codeLocalAccount);
+        pk.setCodeInternationalAccount(codeInternationalAccount);
+
+        Optional<Account> opAccount = accountRepository.findById(pk);
+
+        if(!opAccount.isPresent()){
+            throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
         }
-        AccountClient accountClient = optionalAccountClient.get();
 
-        /* ----------------- Client ----------------- */
-        String fullname = this.retriveClient(accountClient.getPk().getIdentification(),
-                accountClient.getPk().getIdentificationType());
+        Account account = opAccount.get();
 
-        /* ----------------- Last Account Statement ----------------- */
-        Optional<AccountStatementLog> optionalLastAccountStatement = this.accountStatementLogRepository
-                .findTopByOrderByCurrentCutOffDateDesc();
-        if (!optionalLastAccountStatement.isPresent()) {
-            throw new RSRuntimeException(this.NOT_FOUND_ACCOUNT_STATEMENT, RSCode.NOT_FOUND);
+        AccountStatementLog accountStatementLog = getAccountStatement(account);
+        RSAccountStatement accountStatement = AccountStatementMapper.map(accountStatementLog);
+        List<RSAccountStatementTransactions> statementTransactions = new ArrayList<>();
+        RSAccountStatementTransactions statementTransaction;
+
+        List<RSTransaction> transactions = TransactionRequest.getTransactionsBetweenDates(
+                account.getPk().getCodeLocalAccount(),
+                LocalDateTime.ofInstant(accountStatementLog.getLastCutOffDate().toInstant(), ZoneId.systemDefault()),
+                LocalDateTime.ofInstant(accountStatementLog.getCurrentCutOffDate().toInstant(), ZoneId.systemDefault())
+        );
+
+        if(transactions.size() < 1){
+            throw new RSRuntimeException(Messages.TRANSACTIONS_NOT_FOUND, RSCode.NOT_FOUND);
         }
-        AccountStatementLog lastAccountStatementLog = optionalLastAccountStatement.get();
 
-        /* ----------------- Transactions ----------------- */
-        List<RSAccountStatement.Transaction> transactions = optionalLastAccountStatement.isPresent()
-                ? this.retriveAllTransactions(accountCode,
-                        optionalLastAccountStatement.get().getCurrentCutOffDate(),
-                        new Date())
-                : this.retriveAllTransactions(accountCode, new Date(), new Date());
+        for(RSTransaction transaction: transactions){
+            statementTransaction = AccountStatementMapper.map(transaction);
+            statementTransactions.add(statementTransaction);
+        }
 
-        RSAccountStatement rsAccountStatement = AccountStatementMapper.map(fullname, accountClient,
-                lastAccountStatementLog, transactions);
-        return rsAccountStatement;
+        accountStatement.setTransactions(statementTransactions);
+
+        return accountStatement;
     }
 
-    private List<RSAccountStatement.Transaction> retriveAllTransactions(String account, Date from, Date to) {
-        List<RSAccountStatement.Transaction> transactions = new ArrayList<>();
-        return transactions;
-    }
 
-    private String retriveClient(String identification, String identificationType) {
-        String fullname = "Juanito Perez";
-        return fullname;
-    }
+    public AccountStatementLog getAccountStatement(Account account) {
+        Date tempLastCutOffDate;
+        LocalDateTime lastCutOffDate;
+        LocalDateTime currentCutOffDate = Utils.currentDateTime();
 
-    @Transactional
-    private AccountStatementLog createAccountStatementLog(Account account, BigDecimal interestRate,
-            BigDecimal promBalance,
-            String type, Optional<AccountStatementLog> optionalLastAccountStatement) {
+        BigDecimal previousBalance;
+        BigDecimal credit = BigDecimal.valueOf(0);
+        BigDecimal debit = BigDecimal.valueOf(0);
+        BigDecimal interest = BigDecimal.valueOf(0);
+        BigDecimal currentBalance;
+        BigDecimal averageBalance;
+        BigDecimal tempAverageBalance = BigDecimal.valueOf(0);
+
+
+        List<AccountStatementLog> logs = accountStatementLogRepository.findByPkCodeLocalAccountOrderByCurrentCutOffDate(
+                account.getPk().getCodeLocalAccount()
+        );
+
+        if(logs.size() > 0){
+            tempLastCutOffDate = logs.get(0).getCurrentCutOffDate();
+            previousBalance = logs.get(0).getCurrentBalance();
+        }else {
+            tempLastCutOffDate = account.getCreateDate();
+            previousBalance = BigDecimal.valueOf(0);
+        }
+
+        lastCutOffDate =  LocalDateTime.ofInstant(tempLastCutOffDate.toInstant(), ZoneId.systemDefault());
+
+        List<RSTransaction> transactions = TransactionRequest.getTransactionsBetweenDates(
+                account.getPk().getCodeLocalAccount(),
+                lastCutOffDate,
+                currentCutOffDate
+        );
+
+        List<RSInterest> dailyBalances = TransactionRequest.getInterestBetweenDates(
+                account.getPk().getCodeLocalAccount(),
+                lastCutOffDate,
+                currentCutOffDate
+        );
+
+        if(transactions.size() > 0){
+            for(RSTransaction transaction: transactions){
+                if(transaction.getMovement().equals("NOTA DEBITO")){
+                    debit.add(transaction.getValue());
+                }
+
+                if(transaction.getMovement().equals("NOTA CREDITO")) {
+                    credit.add(transaction.getValue());
+                }
+
+                if(transaction.getType().equals("INTERES")){
+                    interest.add(transaction.getValue());
+                }
+            }
+        }
+
+        if(dailyBalances.size() > 0){
+            for(RSInterest dailyBalance: dailyBalances){
+                tempAverageBalance.add(dailyBalance.getAvailableBalance());
+            }
+        }
+
+        averageBalance = tempAverageBalance.divide(BigDecimal.valueOf(30));
+
+        currentBalance = account.getAvailableBalance();
 
         AccountStatementLogPK pk = new AccountStatementLogPK();
         pk.setCodeAccountStateLog(Utils.generateAlphanumericCode(10));
-        pk.setCodeInternationalAccount(account.getPk().getCodeInternationalAccount());
         pk.setCodeLocalAccount(account.getPk().getCodeLocalAccount());
+        pk.setCodeInternationalAccount(account.getPk().getCodeInternationalAccount());
 
         AccountStatementLog accountStatementLog = AccountStatementLog.builder()
                 .pk(pk)
-                .lastCutOffDate(optionalLastAccountStatement.isPresent()
-                        ? optionalLastAccountStatement.get().getCurrentCutOffDate()
-                        : new Date())
-                .interest(interestRate)
-                .currentBalance(account.getPresentBalance())
-                .averageCashBalance(promBalance)
+                .currentCutOffDate(Utils.currentDate())
+                .lastCutOffDate(tempLastCutOffDate)
+                .previousBalance(previousBalance)
+                .creditMovements(credit)
+                .debitMovements(debit)
+                .interest(interest)
+                .currentBalance(currentBalance)
+                .averageCashBalance(averageBalance)
                 .build();
 
-        return accountStatementLog;
+        return  accountStatementLog;
     }
-
 }

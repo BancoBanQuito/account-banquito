@@ -3,26 +3,37 @@ package com.banquito.account.controller.mapper;
 import java.util.List;
 
 import com.banquito.account.controller.dto.RSAccountStatement;
+import com.banquito.account.controller.dto.RSAccountStatementTransactions;
 import com.banquito.account.model.AccountClient;
 import com.banquito.account.model.AccountStatementLog;
+import com.banquito.account.request.dto.RSTransaction;
 
 public class AccountStatementMapper {
 
-    public static RSAccountStatement map(String fullname, AccountClient accountClient, AccountStatementLog accountStatementLog,
-            List<RSAccountStatement.Transaction> transactions) {
-        RSAccountStatement rsAccountStatement = RSAccountStatement.builder()
-                .fullname(fullname)
-                .accountCode(accountClient.getPk().getCodeLocalAccount())
-                .clientIdentification(accountClient.getPk().getIdentification())
-                .lastCutOffDate(accountStatementLog.getLastCutOffDate())
-                .actualCutOffDate(accountStatementLog.getCurrentCutOffDate())
-                .lastBalance(accountStatementLog.getPreviousBalance())
-                .interestRate(accountStatementLog.getInterest())
-                .presentBalance(accountStatementLog.getCurrentBalance())
-                .promBalance(accountStatementLog.getAverageCashBalance())
-                .transactions(transactions)
-                .build();
+    public static RSAccountStatement map(AccountStatementLog accountStatement){
 
-        return rsAccountStatement;
+        return RSAccountStatement.builder()
+                .localCodeAccount(accountStatement.getPk().getCodeLocalAccount())
+                .lastCutOffDate(accountStatement.getLastCutOffDate())
+                .currentCutOffDate(accountStatement.getCurrentCutOffDate())
+                .previousBalance(accountStatement.getPreviousBalance())
+                .creditMovements(accountStatement.getCreditMovements())
+                .debitMovements(accountStatement.getDebitMovements())
+                .interest(accountStatement.getInterest())
+                .currentBalance(accountStatement.getCurrentBalance())
+                .averageBalance(accountStatement.getAverageCashBalance())
+                .build();
+    }
+
+
+    public static RSAccountStatementTransactions map(RSTransaction transaction){
+
+        return RSAccountStatementTransactions.builder()
+                .date(transaction.getExecuteDate())
+                .movement(transaction.getMovement())
+                .concept(transaction.getConcept())
+                .amount(transaction.getValue())
+                .balance(transaction.getAvailableBalance())
+                .build();
     }
 }

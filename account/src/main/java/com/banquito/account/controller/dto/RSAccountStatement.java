@@ -15,23 +15,24 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RSAccountStatement implements Serializable {
-    private String fullname;
-    private String accountCode;
-    private String clientIdentification;
-    private Date lastCutOffDate;
-    private Date actualCutOffDate;
-    private BigDecimal lastBalance;
-    private BigDecimal interestRate;
-    private BigDecimal presentBalance;
-    private BigDecimal promBalance;
-    private List<Transaction> transactions;
 
-    @Data
-    public class Transaction implements Serializable {
-        private String type;
-        private String description;
-        private String movement;
-        private BigDecimal amount;
-        private BigDecimal balance;
-    }
+    private String localCodeAccount;
+
+    private Date lastCutOffDate;
+
+    private Date currentCutOffDate;
+
+    private BigDecimal previousBalance;
+
+    private BigDecimal creditMovements;
+
+    private BigDecimal debitMovements;
+
+    private BigDecimal interest;
+
+    private BigDecimal currentBalance;
+
+    private BigDecimal averageBalance;
+
+    private List<RSAccountStatementTransactions> transactions;
 }

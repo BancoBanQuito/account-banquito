@@ -2,6 +2,8 @@ package com.banquito.account.controller;
 
 import com.banquito.account.controller.dto.*;
 import com.banquito.account.request.TransactionRequest;
+import com.banquito.account.request.dto.RQInterest;
+import com.banquito.account.request.dto.RQTransaction;
 import com.banquito.account.utils.Messages;
 import com.banquito.account.utils.RSCode;
 import com.banquito.account.utils.RSFormat;
@@ -13,7 +15,15 @@ import com.banquito.account.utils.Utils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -28,9 +38,40 @@ public class AccountController {
     //This method is only used for development purposes
     @GetMapping(value = "/test")
     public Object test(){
-         return TransactionRequest.getTransactions("dfd4f80f8f90f1136512",
-                "2023-01-10T22:47:02.6401231",
-                "2023-01-22T22:47:02.6401231");
+
+        /*return TransactionRequest.createInterest(
+                RQInterest.builder()
+                        .codeLocalAccount("dfd4f80f8f90f1136512")
+                        .codeInternationalAccount("0b6edacd6a13797a079335ca502335a3ad")
+                        .ear(BigDecimal.valueOf(5.75))
+                        .availableBalance(BigDecimal.valueOf(40.00))
+                        .build());*/
+
+        /*return TransactionRequest.getInterestBetweenDates("dfd4f80f8f90f1136512",
+                LocalDateTime.parse("2023-01-10T22:47:02.6401231"),
+                LocalDateTime.parse("2023-01-22T22:47:02.6401231"));*/
+
+        /*return TransactionRequest.createTransaction(
+                RQTransaction.builder()
+                        .movement("NOTA CREDITO")
+                        .type("INTERES")
+                        .codeLocalAccount("dfd4f80f8f90f1136512")
+                        .codeInternationalAccount("0b6edacd6a13797a079335ca502335a3ad")
+                        .concept("Calculo interes")
+                        .value(BigDecimal.valueOf(0.01))
+                        .build()
+        );*/
+
+         /*return TransactionRequest.getTransactionsBetweenDates("dfd4f80f8f90f1136512",
+                LocalDateTime.parse("2023-01-10T22:47:02.6401231"),
+                LocalDateTime.parse("2023-01-22T22:47:02.6401231"));*/
+
+        /*return TransactionRequest.getInvestmentInterest("dfd4f80f8f90f1136512",
+                91,
+                BigDecimal.valueOf(20000),
+                BigDecimal.valueOf(2.52));*/
+
+        return "Hello";
     }
 
     @PostMapping

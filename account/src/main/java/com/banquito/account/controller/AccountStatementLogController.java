@@ -24,17 +24,21 @@ public class AccountStatementLogController {
         this.accountStatementLogService = accountStatementLogService;
     }
 
-    @GetMapping("/{accountCode}")
-    public ResponseEntity<RSFormat> findAccountStatement(@PathVariable("accountCode") String accountCode) {
+    @GetMapping("/{codeLocalAccount}/{codeInternationalAccount}")
+    public ResponseEntity<RSFormat> findAccountStatement(
+            @PathVariable("codeLocalAccount") String codeLocalAccount,
+            @PathVariable("codeInternationalAccount") String codeInternationalAccount) {
         try {
-            if (Utils.isNullEmpty(accountCode)) {
+            if (Utils.isNullEmpty(codeLocalAccount) || Utils.isNullEmpty(codeInternationalAccount)) {
                 return ResponseEntity.status(RSCode.BAD_REQUEST.code)
                         .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
             }
 
-            RSAccountStatement rsAccountStatement = this.accountStatementLogService.findAccountStatement(accountCode);
+            RSAccountStatement responseAccountStatement = this.accountStatementLogService
+                    .findAccountStatement(codeLocalAccount, codeInternationalAccount);
+
             return ResponseEntity.status(RSCode.SUCCESS.code)
-                    .body(RSFormat.builder().message("Success").data(rsAccountStatement).build());
+                    .body(RSFormat.builder().message("Success").data(responseAccountStatement).build());
         } catch (RSRuntimeException e) {
             return ResponseEntity.status(e.getCode())
                     .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());

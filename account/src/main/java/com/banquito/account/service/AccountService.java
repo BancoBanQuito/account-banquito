@@ -2,12 +2,14 @@ package com.banquito.account.service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import com.banquito.account.model.*;
 import com.banquito.account.repository.AccountAssociatedServiceRepository;
 import com.banquito.account.utils.Messages;
+import lombok.Data;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,11 @@ public class AccountService {
         this.accountRepository = accountRepository;
         this.accountClientRepository = accountClientRepository;
         this.accountAssociatedServiceRepository = accountAssociatedServiceRepository;
+    }
+
+    //The  test service is only used for development purposes
+    public Object test(){
+        return accountRepository.findByCodeProductAndCodeProductType("89e47dfa71b983acb3c20e31b44ff652","239368d97b07f1459ae208d520d3db27");
     }
 
     @Transactional

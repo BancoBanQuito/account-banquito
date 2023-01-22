@@ -1,5 +1,6 @@
 package com.banquito.account.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,5 +11,6 @@ import com.banquito.account.model.AccountPK;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, AccountPK> {
-    public Optional<Account> findByPkCodeLocalAccountOrPkCodeInternationalAccount(String accountLocalCode, String accountInternationalCode);
+    List<Account> findByCodeProductAndCodeProductType(String codeProduct, String codeProductType);
+
 }
