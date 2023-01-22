@@ -120,6 +120,10 @@ public class ScheduledTasks {
 
         for (Account account : accounts) {
 
+            if(!account.getStatus().equals("ACT")){
+                continue;
+            }
+
             RQInterest interest = RQInterest.builder()
                     .codeLocalAccount(account.getPk().getCodeLocalAccount())
                     .codeInternationalAccount(account.getPk().getCodeInternationalAccount())
@@ -152,6 +156,10 @@ public class ScheduledTasks {
 
         if(formatter.format(currentDayOfMonth).equals(formatter.format(lastDayOfMonth))){
             for (Account account : accounts) {
+
+                if(!account.getStatus().equals("ACT")){
+                    continue;
+                }
 
                 BigDecimal interest = BigDecimal.valueOf(0);
 
@@ -206,6 +214,10 @@ public class ScheduledTasks {
         String currentDate = sm.format(Utils.currentDate());
 
         for (Account account : accounts) {
+
+            if(!account.getStatus().equals("ACT")){
+                continue;
+            }
 
             String closeDate = sm.format(account.getCloseDate());
 

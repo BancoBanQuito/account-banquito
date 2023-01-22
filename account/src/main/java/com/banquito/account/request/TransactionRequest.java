@@ -140,7 +140,7 @@ public class TransactionRequest {
 
     public static RSInvestment getInvestmentInterest(String codeLocalAccount, Integer days, BigDecimal capital, BigDecimal aer){
 
-        String url = transaction.concat("/interest/{codeLocalAccount}/{days}/{capital}/{ear}");
+        String url = transaction.concat("/interest/investment/{codeLocalAccount}/{days}/{capital}/{ear}");
 
         ResponseEntity<RSGeneric> response = restTemplate.getForEntity(
                 url,

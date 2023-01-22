@@ -5,6 +5,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -66,6 +68,7 @@ public class Utils {
 
     public static boolean saveLog(Object object, String codeLocalAccount){
         try {
+            Files.createDirectories(Paths.get("../log/"));
             String date = currentDateTime().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
             String filename = date + "_" +codeLocalAccount + ".txt";
             File file = new File("../log/"+filename);
