@@ -6,8 +6,6 @@ import com.banquito.account.model.*;
 import com.banquito.account.repository.AccountAssociatedServiceRepository;
 import com.banquito.account.repository.AccountClientRepository;
 import com.banquito.account.repository.AccountRepository;
-import com.banquito.account.request.TransactionRequest;
-import com.banquito.account.request.dto.*;
 import com.banquito.account.utils.Messages;
 import com.banquito.account.utils.RSCode;
 import com.banquito.account.utils.Status;
@@ -17,12 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,15 +33,6 @@ public class AccountService {
         this.accountRepository = accountRepository;
         this.accountClientRepository = accountClientRepository;
         this.accountAssociatedServiceRepository = accountAssociatedServiceRepository;
-    }
-
-    //The  test service is only used for development purposes
-    public Object test() {
-
-        List<Account> accounts = accountRepository.findByCodeProductAndCodeProductType(
-                "aed99062a63c327876956943ae41dd36", "239368d97b07f1459ae208d520d3db27");
-
-        return "DONE";
     }
 
     @Transactional

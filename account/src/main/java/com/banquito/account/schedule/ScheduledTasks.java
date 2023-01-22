@@ -100,6 +100,7 @@ public class ScheduledTasks {
                         .codeLocalAccount(account.getPk().getCodeLocalAccount())
                         .codeInternationalAccount(account.getPk().getCodeInternationalAccount())
                         .concept("Calculo interes, cuenta de ahorros GANA DIARIO")
+                        .description("Capitalizacion de intereses de forma diaria")
                         .value(responseInterest.getValue())
                         .build();
 
@@ -181,6 +182,7 @@ public class ScheduledTasks {
                         .codeLocalAccount(account.getPk().getCodeLocalAccount())
                         .codeInternationalAccount(account.getPk().getCodeInternationalAccount())
                         .concept("Calculo interes, cuenta de ahorros STANDARD")
+                        .description("Capitalizacion de intereses de forma mensual")
                         .value(interest)
                         .build();
 
@@ -251,6 +253,7 @@ public class ScheduledTasks {
                 .codeLocalAccount(account.getPk().getCodeLocalAccount())
                 .codeInternationalAccount(account.getPk().getCodeInternationalAccount())
                 .concept("Calculo interes, inversion estandar")
+                .description("Capitalizacion de intereses generada por inversion")
                 .value(responseInvestment.getRawInterest())
                 .build();
 
@@ -261,10 +264,11 @@ public class ScheduledTasks {
 
             RQTransaction debitTransaction = RQTransaction.builder()
                     .movement("NOTA DEBITO")
-                    .type("INTERES")
+                    .type("PAGO")
                     .codeLocalAccount(account.getPk().getCodeLocalAccount())
                     .codeInternationalAccount(account.getPk().getCodeInternationalAccount())
                     .concept("Retencion 2% de inversion")
+                    .description("Capitalizacion de intereses generada por inversion")
                     .value(responseInvestment.getRetention())
                     .build();
 
@@ -300,6 +304,10 @@ public class ScheduledTasks {
                 product.getCode(), product.getType());
 
         for (Account account : accounts) {
+
+            if(!account.getStatus().equals("ACT")){
+                continue;
+            }
 
             AccountStatementLog accountStatementLog = accountLogService.getAccountStatement(account);
 

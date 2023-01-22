@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -38,13 +39,6 @@ public class AccountStatementLogService {
             AccountRepository accountRepository) {
         this.accountStatementLogRepository = accountStatementLogRepository;
         this.accountRepository = accountRepository;
-    }
-
-    //The  test service is only used for development purposes
-    public Object test(){
-        List<AccountStatementLog> list = accountStatementLogRepository.findByPkCodeLocalAccountOrderByCurrentCutOffDateDesc("22cf89573e25a91bffbb");
-
-        return list.get(0).getCurrentCutOffDate();
     }
 
     public RSAccountStatement findAccountStatement(String codeLocalAccount, String codeInternationalAccount) {
@@ -156,7 +150,9 @@ public class AccountStatementLogService {
             }
         }
 
-        averageBalance = tempAverageBalance.divide(BigDecimal.valueOf(30));
+        averageBalance = tempAverageBalance.divide(BigDecimal.valueOf(30),4, RoundingMode.HALF_EVEN);
+
+        averageBalance = averageBalance.setScale(2, RoundingMode.HALF_EVEN);
 
         currentBalance = account.getAvailableBalance();
 
