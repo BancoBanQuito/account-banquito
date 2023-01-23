@@ -27,20 +27,20 @@ import java.util.List;
 @Component
 public class ScheduledTasks {
 
-    private final Product winEveryDaySavings = Product.builder().code("savingsOne")
-            .type("savings").interest(BigDecimal.valueOf(4.25)).build();
+    private final Product winEveryDaySavings = Product.builder().code("6c24027751bc43c5b232242e307880a7")
+            .type("4a169d2a0801710e895b0cb2abcfabdb").interest(BigDecimal.valueOf(4.25)).build();
 
-    private final Product standardSavings = Product.builder().code("savingsTwo")
-            .type("savings").interest(BigDecimal.valueOf(5.25)).build();
+    private final Product standardSavings = Product.builder().code("6c24027751bc43c5b232242e307880a7")
+            .type("ed3140ca2610b20511542066357b121f").interest(BigDecimal.valueOf(5.25)).build();
 
-    private final Product standardCurrent = Product.builder().code("currentOne")
-            .type("current").interest(BigDecimal.valueOf(0)).build();
+    private final Product standardCurrent = Product.builder().code("bdc60173d3f0a82a1a04557e2d14ee32")
+            .type("bc9699d3e5dafe9903b0dcd7e8778db1").interest(BigDecimal.valueOf(0)).build();
 
-    private final Product standardInvestment = Product.builder().code("investmentOne")
-            .type("investment").interest(BigDecimal.valueOf(6.5)).build();
+    private final Product standardInvestment = Product.builder().code("be04e60db27fd509df44cfdb72dcfd74")
+            .type("96d6161f059d93659aa1ef4662260768").interest(BigDecimal.valueOf(6.5)).build();
 
-    private final Product premiumInvestment = Product.builder().code("investmentTwo")
-            .type("investment").interest(BigDecimal.valueOf(7.5)).build();
+    private final Product premiumInvestment = Product.builder().code("be04e60db27fd509df44cfdb72dcfd74")
+            .type("344ac2fd48b5e4ea31851193523a26d9").interest(BigDecimal.valueOf(7.5)).build();
 
     private static final Logger log = LoggerFactory.getLogger(ScheduledTasks.class);
 
