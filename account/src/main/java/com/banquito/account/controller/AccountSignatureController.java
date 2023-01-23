@@ -5,6 +5,7 @@ import com.banquito.account.controller.dto.RQSignatureRoleStatus;
 import com.banquito.account.controller.dto.RSSignature;
 import com.banquito.account.controller.mapper.AccountSignatureMapper;
 import com.banquito.account.exception.RSRuntimeException;
+import com.banquito.account.request.ClientRequest;
 import com.banquito.account.service.AccountSignatureService;
 import com.banquito.account.utils.*;
 import org.springframework.http.ResponseEntity;
@@ -29,10 +30,7 @@ public class AccountSignatureController {
     @GetMapping(value = "/test")
     public Object test(){
 
-        Date in = new Date();
-        LocalDateTime lastCutOffDate =  LocalDateTime.ofInstant(in.toInstant(), ZoneId.systemDefault());
-
-        return lastCutOffDate;
+        return ClientRequest.getClientData("DNI", "1004805758");
     }
 
     @PostMapping

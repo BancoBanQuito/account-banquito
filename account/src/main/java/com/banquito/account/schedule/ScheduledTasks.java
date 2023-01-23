@@ -28,10 +28,10 @@ import java.util.List;
 public class ScheduledTasks {
 
     private final Product winEveryDaySavings = Product.builder().code("savingsOne")
-            .type("savings").interest(BigDecimal.valueOf(5.75)).build();
+            .type("savings").interest(BigDecimal.valueOf(4.25)).build();
 
     private final Product standardSavings = Product.builder().code("savingsTwo")
-            .type("savings").interest(BigDecimal.valueOf(6.50)).build();
+            .type("savings").interest(BigDecimal.valueOf(5.25)).build();
 
     private final Product standardCurrent = Product.builder().code("currentOne")
             .type("current").interest(BigDecimal.valueOf(0)).build();
