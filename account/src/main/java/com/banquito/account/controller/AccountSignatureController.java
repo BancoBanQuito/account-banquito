@@ -10,6 +10,10 @@ import com.banquito.account.utils.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -24,14 +28,19 @@ public class AccountSignatureController {
 
     @GetMapping(value = "/test")
     public Object test(){
-        return accountSignatureService.Test();
+
+        Date in = new Date();
+        LocalDateTime lastCutOffDate =  LocalDateTime.ofInstant(in.toInstant(), ZoneId.systemDefault());
+
+        return lastCutOffDate;
     }
 
     @PostMapping
     public ResponseEntity<RSFormat> createSignature(@RequestBody RQSignature signature) {
         try {
             if(!Utils.hasAllAttributes(signature)){
-                throw new RSRuntimeException(Messages.MISSING_PARAMS, RSCode.BAD_REQUEST);
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
+                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
             }
             accountSignatureService.createSignature(AccountSignatureMapper.map(signature));
             return ResponseEntity.status(RSCode.CREATED.code)
@@ -42,7 +51,7 @@ public class AccountSignatureController {
                     .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
 
         } catch (Exception e) {
-            return ResponseEntity.status(500)
+            return ResponseEntity.status(RSCode.INTERNAL_SERVER_ERROR.code)
                     .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
         }
     }
@@ -53,7 +62,11 @@ public class AccountSignatureController {
             @PathVariable("identification") String identification
             ){
         try {
-            List<RSSignature> signatures = accountSignatureService.findSignatures(identificationType, identification);
+            if(Utils.isNullEmpty(identificationType) || Utils.isNullEmpty(identification)){
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
+                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
+            }
+            List<RSSignature> signatures = accountSignatureService.findSignaturesById(identificationType, identification);
             return ResponseEntity.status(RSCode.CREATED.code)
                     .body(RSFormat.builder().message("Success").data(signatures).build());
 
@@ -62,7 +75,7 @@ public class AccountSignatureController {
                     .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
 
         } catch (Exception e) {
-            return ResponseEntity.status(500)
+            return ResponseEntity.status(RSCode.INTERNAL_SERVER_ERROR.code)
                     .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
         }
     }
@@ -86,7 +99,8 @@ public class AccountSignatureController {
                     .build();
 
             if(!Utils.hasAllAttributes(signature)){
-                throw new RSRuntimeException(Messages.MISSING_PARAMS, RSCode.BAD_REQUEST);
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
+                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
             }
 
             accountSignatureService.updateSignatureRoleStatus(signature);
@@ -98,7 +112,7 @@ public class AccountSignatureController {
                     .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
 
         } catch (Exception e) {
-            return ResponseEntity.status(500)
+            return ResponseEntity.status(RSCode.INTERNAL_SERVER_ERROR.code)
                     .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
         }
     }

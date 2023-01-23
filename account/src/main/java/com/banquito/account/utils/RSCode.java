@@ -5,7 +5,7 @@ public enum RSCode {
     SUCCESS(200),
     BAD_REQUEST(400),
     NOT_FOUND(404),
-    INTERNAL_ERROR_SERVER(500);
+    INTERNAL_SERVER_ERROR(500);
 
     public final int code;
     RSCode(int code) {

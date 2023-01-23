@@ -10,7 +10,11 @@ public class Messages {
     public static final String SIGNATURE_NOT_UPDATED = "Ha ocurrido un error al actualizar la firma";
     public static final String SERVICE_NOT_UPDATED = "Ha ocurrido un error al actualizar el servicio asociado a la cuenta";
     public static final String MISSING_PARAMS = "Faltan parametros en la peticion";
-    public static final String NOT_FOUND_ACCOUNTS_FOR_CLIENT = "No hay cuentas asociadas al cliente";
-    public static final String NOT_FOUND_ACCOUNTS_FOR_CODE = "No hay cuentas asociadas a ese codigo";
+    public static final String ACCOUNTS_NOT_FOUND_FOR_CLIENT = "No hay cuentas asociadas al cliente";
+    public static final String ACCOUNTS_NOT_FOUND_FOR_CODE = "No hay cuentas asociadas a ese codigo";
+    public static final String TRANSACTIONS_NOT_FOUND = "No se han encontrado transacciones en ese periodo de tiempo";
+    public static final String STATEMENT_NOT_CREATED = "El estado de cuenta no pudo ser creado";
+    public static final String STATEMENT_ALREADY_EXIST = "Ya existe un estado de cuenta para esta fecha";
+    public static final String STATEMENT_NOT_FOUND = "No se encontro el estado de cuenta";
     public static final String INTERNAL_ERROR = "Ha ocurrido un error";
 }

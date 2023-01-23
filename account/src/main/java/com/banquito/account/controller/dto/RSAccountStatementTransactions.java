@@ -12,8 +12,15 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RQAccountBalance implements Serializable {
-    private BigDecimal presentBalance;
+public class RSAccountStatementTransactions implements Serializable {
 
-    private BigDecimal availableBalance;
+    private String date;
+
+    private String movement;
+
+    private String concept;
+
+    private BigDecimal amount;
+
+    private BigDecimal balance;
 }

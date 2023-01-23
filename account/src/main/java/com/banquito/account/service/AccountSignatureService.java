@@ -45,7 +45,7 @@ public class AccountSignatureService {
         try {
             this.accountSignatureRepository.save(accountSignature);
         } catch (Exception e) {
-            throw new RSRuntimeException(Messages.SIGNATURE_NOT_CREATED, RSCode.INTERNAL_ERROR_SERVER);
+            throw new RSRuntimeException(Messages.SIGNATURE_NOT_CREATED, RSCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -64,7 +64,7 @@ public class AccountSignatureService {
 
         //verified record exist
         if(!opAccountSignature.isPresent()){
-            throw new RSRuntimeException(Messages.NOT_FOUND_ACCOUNTS_FOR_CODE, RSCode.NOT_FOUND);
+            throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
         }
 
         AccountSignature accountSignature = opAccountSignature.get();
@@ -75,22 +75,18 @@ public class AccountSignatureService {
         try {
             this.accountSignatureRepository.save(accountSignature);
         } catch (Exception e) {
-            throw new RSRuntimeException(Messages.SIGNATURE_NOT_UPDATED, RSCode.INTERNAL_ERROR_SERVER);
+            throw new RSRuntimeException(Messages.SIGNATURE_NOT_UPDATED, RSCode.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public List<RSSignature> findSignatures(String identificationType, String identification){
-        //validate data
-        if(Utils.isNullEmpty(identificationType) || Utils.isNullEmpty(identification)){
-            throw new RSRuntimeException(Messages.MISSING_PARAMS, RSCode.BAD_REQUEST);
-        }
+    public List<RSSignature> findSignaturesById(String identificationType, String identification){
 
         //get requested record
         List<AccountSignature> dbSignatures = accountSignatureRepository.
                 findByPkIdentificationTypeAndPkIdentification(identificationType, identification);
 
         if(dbSignatures.size() < 1){
-            throw new RSRuntimeException(Messages.NOT_FOUND_ACCOUNTS_FOR_CLIENT, RSCode.NOT_FOUND);
+            throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CLIENT, RSCode.NOT_FOUND);
         }
 
         //Call api for client name TODO
@@ -105,4 +101,6 @@ public class AccountSignatureService {
 
         return signatures;
     }
+
+
 }

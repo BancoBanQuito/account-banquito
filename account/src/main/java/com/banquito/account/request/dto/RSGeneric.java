@@ -1,4 +1,4 @@
-package com.banquito.account.controller.dto;
+package com.banquito.account.request.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RQAccountStatus implements Serializable {
-
-    private String status;
+public class RSGeneric implements Serializable {
+    private String message;
+    private Object data;
 }

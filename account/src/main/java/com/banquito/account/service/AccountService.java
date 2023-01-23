@@ -1,25 +1,23 @@
 package com.banquito.account.service;
 
+import com.banquito.account.controller.dto.RSAccount;
+import com.banquito.account.exception.RSRuntimeException;
+import com.banquito.account.model.*;
+import com.banquito.account.repository.AccountAssociatedServiceRepository;
+import com.banquito.account.repository.AccountClientRepository;
+import com.banquito.account.repository.AccountRepository;
+import com.banquito.account.utils.Messages;
+import com.banquito.account.utils.RSCode;
+import com.banquito.account.utils.Status;
+import com.banquito.account.utils.Utils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import com.banquito.account.model.*;
-import com.banquito.account.repository.AccountAssociatedServiceRepository;
-import com.banquito.account.utils.Messages;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.banquito.account.utils.Utils;
-import com.banquito.account.utils.Status;
-import com.banquito.account.utils.RSCode;
-import com.banquito.account.controller.dto.RSAccount;
-import com.banquito.account.exception.RSRuntimeException;
-import com.banquito.account.repository.AccountClientRepository;
-import com.banquito.account.repository.AccountRepository;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -39,9 +37,6 @@ public class AccountService {
 
     @Transactional
     public Account createAccount(Account account, String identification, String identificationType) {
-        if (identification.isEmpty() || identificationType.isEmpty() || account.equals(null)) {
-            throw new RSRuntimeException(Messages.MISSING_PARAMS, RSCode.NOT_FOUND);
-        }
 
         String localAccountCode = Utils.generateNumberCode(20);
         String internationalAccountCode = Utils.generateNumberCode(34);
@@ -72,7 +67,7 @@ public class AccountService {
             this.accountRepository.save(account);
             this.accountClientRepository.save(accountClient);
         } catch (Exception e) {
-            throw new RSRuntimeException(Messages.ACCOUNT_NOT_CREATED, RSCode.INTERNAL_ERROR_SERVER);
+            throw new RSRuntimeException(Messages.ACCOUNT_NOT_CREATED, RSCode.INTERNAL_SERVER_ERROR);
         }
         return account;
     }
@@ -85,7 +80,7 @@ public class AccountService {
                 .findByPkIdentificationAndPkIdentificationType(identification, identificationType);
         log.info("" + accountClients.size());
         if (accountClients.size() < 1) {
-            throw new RSRuntimeException(Messages.NOT_FOUND_ACCOUNTS_FOR_CLIENT, RSCode.NOT_FOUND);
+            throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CLIENT, RSCode.NOT_FOUND);
         }
 
         try {
@@ -111,7 +106,7 @@ public class AccountService {
                 }
             });
         } catch (Exception e) {
-            throw new RSRuntimeException(Messages.INTERNAL_ERROR, RSCode.INTERNAL_ERROR_SERVER);
+            throw new RSRuntimeException(Messages.INTERNAL_ERROR, RSCode.INTERNAL_SERVER_ERROR);
         }
 
         return rsAccounts;
@@ -138,13 +133,13 @@ public class AccountService {
         );
 
         if(!opAccount.isPresent()){
-            throw new RSRuntimeException(Messages.NOT_FOUND_ACCOUNTS_FOR_CODE, RSCode.NOT_FOUND);
+            throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
         }
 
         return opAccount.get();
     }
 
-
+    @Transactional
     public void updateAccountStatus(String codeLocalAccount, String codeInternationalAccount, String status){
 
         Optional<Account> opAccount = accountRepository.findById(
@@ -155,7 +150,7 @@ public class AccountService {
         );
 
         if(!opAccount.isPresent()){
-            throw new RSRuntimeException(Messages.NOT_FOUND_ACCOUNTS_FOR_CODE, RSCode.NOT_FOUND);
+            throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
         }
 
         Account account = opAccount.get();
@@ -172,7 +167,7 @@ public class AccountService {
                     try {
                         this.accountAssociatedServiceRepository.save(service);
                     } catch (Exception e) {
-                        throw new RSRuntimeException(Messages.SERVICE_NOT_UPDATED, RSCode.INTERNAL_ERROR_SERVER);
+                        throw new RSRuntimeException(Messages.SERVICE_NOT_UPDATED, RSCode.INTERNAL_SERVER_ERROR);
                     }
                 }
             }
@@ -181,10 +176,11 @@ public class AccountService {
         try {
             this.accountRepository.save(account);
         } catch (Exception e) {
-            throw new RSRuntimeException(Messages.ACCOUNT_NOT_UPDATED, RSCode.INTERNAL_ERROR_SERVER);
+            throw new RSRuntimeException(Messages.ACCOUNT_NOT_UPDATED, RSCode.INTERNAL_SERVER_ERROR);
         }
     }
 
+    @Transactional
     public void updateAccountBalance(String codeLocalAccount, String codeInternationalAccount,
                                      BigDecimal presentBalance,BigDecimal availableBalance){
 
@@ -196,7 +192,7 @@ public class AccountService {
         );
 
         if(!opAccount.isPresent()){
-            throw new RSRuntimeException(Messages.NOT_FOUND_ACCOUNTS_FOR_CODE, RSCode.NOT_FOUND);
+            throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
         }
 
         Account account = opAccount.get();
@@ -207,7 +203,7 @@ public class AccountService {
         try {
             this.accountRepository.save(account);
         } catch (Exception e) {
-            throw new RSRuntimeException(Messages.ACCOUNT_NOT_UPDATED, RSCode.INTERNAL_ERROR_SERVER);
+            throw new RSRuntimeException(Messages.ACCOUNT_NOT_UPDATED, RSCode.INTERNAL_SERVER_ERROR);
         }
     }
 }

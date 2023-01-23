@@ -10,7 +10,6 @@ import java.util.List;
 
 @Repository
 public interface AccountAssociatedServiceRepository extends JpaRepository<AccountAssociatedService, AccountAssociatedServicePK>{
-
     List<AccountAssociatedService> findByPkCodeLocalAccountAndPkCodeInternationalAccount(String codeLocalAccount, String codeInternationalAccount);
 
 }
