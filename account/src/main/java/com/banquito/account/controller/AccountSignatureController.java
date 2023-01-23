@@ -27,12 +27,6 @@ public class AccountSignatureController {
         this.accountSignatureService = accountSignatureService;
     }
 
-    @GetMapping(value = "/test")
-    public Object test(){
-
-        return ClientRequest.getClientData("DNI", "1750343210");
-    }
-
     @PostMapping
     public ResponseEntity<RSFormat> createSignature(@RequestBody RQSignature signature) {
         try {
