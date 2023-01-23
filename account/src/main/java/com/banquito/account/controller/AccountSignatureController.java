@@ -30,7 +30,7 @@ public class AccountSignatureController {
     @GetMapping(value = "/test")
     public Object test(){
 
-        return ClientRequest.getClientData("DNI", "1004805758");
+        return ClientRequest.getClientData("DNI", "1750343210");
     }
 
     @PostMapping
@@ -54,8 +54,8 @@ public class AccountSignatureController {
         }
     }
 
-    @GetMapping(value = "/{identificationType}/{identification}")
-    public ResponseEntity<RSFormat> getSignatureList(
+    @GetMapping(value = "/id/{identificationType}/{identification}")
+    public ResponseEntity<RSFormat> getSignatureListById(
             @PathVariable("identificationType") String identificationType,
             @PathVariable("identification") String identification
             ){
@@ -65,6 +65,30 @@ public class AccountSignatureController {
                         .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
             }
             List<RSSignature> signatures = accountSignatureService.findSignaturesById(identificationType, identification);
+            return ResponseEntity.status(RSCode.CREATED.code)
+                    .body(RSFormat.builder().message("Success").data(signatures).build());
+
+        } catch (RSRuntimeException e) {
+            return ResponseEntity.status(e.getCode())
+                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
+
+        } catch (Exception e) {
+            return ResponseEntity.status(RSCode.INTERNAL_SERVER_ERROR.code)
+                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
+        }
+    }
+    @GetMapping(value = "/code/{codeLocalAccount}/{codeInternationalAccount}")
+    public ResponseEntity<RSFormat> getSignatureListByCode(
+            @PathVariable("codeLocalAccount") String codeLocalAccount,
+            @PathVariable("codeInternationalAccount") String codeInternationalAccount
+    ){
+        try {
+            if(Utils.isNullEmpty(codeLocalAccount) || Utils.isNullEmpty(codeInternationalAccount)){
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
+                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
+            }
+            List<RSSignature> signatures = accountSignatureService.findSignaturesByCode(
+                    codeLocalAccount, codeInternationalAccount);
             return ResponseEntity.status(RSCode.CREATED.code)
                     .body(RSFormat.builder().message("Success").data(signatures).build());
 
