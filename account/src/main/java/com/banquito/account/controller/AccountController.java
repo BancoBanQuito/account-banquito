@@ -123,7 +123,7 @@ public class AccountController {
             Account account = accountService.findAccountByCodeLocalAccount(codeLocalAccount);
 
             return ResponseEntity.status(RSCode.SUCCESS.code).
-                    body(RSFormat.builder().message("Success").data(AccountMapper.mapAccount(account)).build());
+                    body(RSFormat.builder().message("Success").data(AccountMapper.mapAccountSimple(account)).build());
 
         } catch (RSRuntimeException e) {
             return ResponseEntity.status(e.getCode())
