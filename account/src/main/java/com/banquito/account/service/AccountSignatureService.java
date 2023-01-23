@@ -95,7 +95,7 @@ public class AccountSignatureService {
         List<RSSignature> signatures = new ArrayList<>();
         RSSignature signature;
         for(AccountSignature dbSignature: dbSignatures){
-            signature = AccountSignatureMapper.map(dbSignature, "Nombre Cliente");
+            signature = AccountSignatureMapper.map(dbSignature, "Nombre-Cliente");
             signatures.add(signature);
         }
 
