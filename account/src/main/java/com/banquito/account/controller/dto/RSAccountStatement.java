@@ -2,6 +2,7 @@ package com.banquito.account.controller.dto;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -18,9 +19,9 @@ public class RSAccountStatement implements Serializable {
 
     private String localCodeAccount;
 
-    private Date lastCutOffDate;
+    private LocalDateTime lastCutOffDate;
 
-    private Date currentCutOffDate;
+    private LocalDateTime currentCutOffDate;
 
     private BigDecimal previousBalance;
 

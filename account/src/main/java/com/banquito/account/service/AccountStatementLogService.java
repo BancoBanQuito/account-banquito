@@ -22,12 +22,10 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -55,10 +53,13 @@ public class AccountStatementLogService {
         }
 
         Account account = opAccount.get();
-
         AccountStatementLog accountStatementLog = computeAccountStatement(account);
-        RSAccountStatement accountStatement = AccountStatementMapper.map(accountStatementLog);
 
+        if(accountStatementLog == null){
+            throw new RSRuntimeException(Messages.STATEMENT_ALREADY_EXIST, RSCode.BAD_REQUEST);
+        }
+
+        RSAccountStatement accountStatement = AccountStatementMapper.map(accountStatementLog);
         return findAccountStatementTransactions(accountStatementLog, accountStatement);
     }
 
@@ -89,8 +90,24 @@ public class AccountStatementLogService {
         }
 
         AccountStatementLog accountStatementLog = opAccountStatementLog.get();
-        RSAccountStatement accountStatement = AccountStatementMapper.map(accountStatementLog);
 
+        Calendar calendar1 = Calendar.getInstance();
+        Calendar calendar2 = Calendar.getInstance();
+
+        calendar1.setTime(accountStatementLog.getLastCutOffDate());
+        calendar1.setTimeZone(TimeZone.getTimeZone(ZoneId.systemDefault()));
+        calendar1.add(Calendar.HOUR_OF_DAY, 0);
+
+        calendar2.setTime(accountStatementLog.getCurrentCutOffDate());
+        calendar2.setTimeZone(TimeZone.getTimeZone(ZoneId.systemDefault()));
+        calendar2.add(Calendar.HOUR_OF_DAY, 23);
+        calendar2.add(Calendar.MINUTE, 59);
+        calendar2.add(Calendar.SECOND, 59);
+
+        accountStatementLog.setLastCutOffDate(calendar1.getTime());
+        accountStatementLog.setCurrentCutOffDate(calendar2.getTime());
+
+        RSAccountStatement accountStatement = AccountStatementMapper.map(accountStatementLog);
         return findAccountStatementTransactions(accountStatementLog, accountStatement);
     }
 
@@ -129,9 +146,12 @@ public class AccountStatementLogService {
 
 
     public AccountStatementLog computeAccountStatement(Account account) {
+
+        SimpleDateFormat sm = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar calendar = Calendar.getInstance();
         Date tempLastCutOffDate;
         LocalDateTime lastCutOffDate;
-        LocalDateTime currentCutOffDate = Utils.currentDateTime();
+        LocalDateTime currentCutOffDate = Utils.currentDateTime().withHour(23).withMinute(59).withSecond(59);
 
         BigDecimal previousBalance;
         BigDecimal credit = BigDecimal.valueOf(0);
@@ -141,20 +161,28 @@ public class AccountStatementLogService {
         BigDecimal averageBalance;
         BigDecimal tempAverageBalance = BigDecimal.valueOf(0);
 
-
         List<AccountStatementLog> logs = accountStatementLogRepository.findByPkCodeLocalAccountOrderByCurrentCutOffDateDesc(
                 account.getPk().getCodeLocalAccount()
         );
 
         if(logs.size() > 0){
             tempLastCutOffDate = logs.get(0).getCurrentCutOffDate();
+
+            //Check if account statement was already compute today
+            if(sm.format(tempLastCutOffDate).equals(sm.format(Utils.currentDate()))){
+                return null;
+            }
+
+            calendar.setTime(tempLastCutOffDate);
+            calendar.add(Calendar.DATE, 1);
+            tempLastCutOffDate = calendar.getTime();
+            lastCutOffDate =  LocalDateTime.ofInstant(tempLastCutOffDate.toInstant(), ZoneId.systemDefault());
             previousBalance = logs.get(0).getCurrentBalance();
         }else {
             tempLastCutOffDate = account.getCreateDate();
+            lastCutOffDate = LocalDateTime.ofInstant(tempLastCutOffDate.toInstant(), ZoneId.systemDefault());
             previousBalance = BigDecimal.valueOf(0);
         }
-
-        lastCutOffDate =  LocalDateTime.ofInstant(tempLastCutOffDate.toInstant(), ZoneId.systemDefault());
 
         List<RSTransaction> transactions = TransactionRequest.getTransactionsBetweenDates(
                 account.getPk().getCodeLocalAccount(),

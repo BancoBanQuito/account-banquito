@@ -79,7 +79,7 @@ public class AccountSignatureService {
         }
     }
 
-    public List<RSSignature> findSignatures(String identificationType, String identification){
+    public List<RSSignature> findSignaturesById(String identificationType, String identification){
 
         //get requested record
         List<AccountSignature> dbSignatures = accountSignatureRepository.
@@ -101,4 +101,6 @@ public class AccountSignatureService {
 
         return signatures;
     }
+
+
 }

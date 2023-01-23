@@ -1,5 +1,7 @@
 package com.banquito.account.controller.mapper;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import com.banquito.account.controller.dto.RSAccountStatement;
@@ -15,8 +17,12 @@ public class AccountStatementMapper {
 
         return RSAccountStatement.builder()
                 .localCodeAccount(accountStatement.getPk().getCodeLocalAccount())
-                .lastCutOffDate(accountStatement.getLastCutOffDate())
-                .currentCutOffDate(accountStatement.getCurrentCutOffDate())
+                .lastCutOffDate(
+                        LocalDateTime.ofInstant(accountStatement.getLastCutOffDate().toInstant(), ZoneId.systemDefault())
+                )
+                .currentCutOffDate(
+                        LocalDateTime.ofInstant(accountStatement.getCurrentCutOffDate().toInstant(), ZoneId.systemDefault())
+                )
                 .previousBalance(accountStatement.getPreviousBalance())
                 .creditMovements(accountStatement.getCreditMovements())
                 .debitMovements(accountStatement.getDebitMovements())

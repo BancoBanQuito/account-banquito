@@ -15,4 +15,7 @@ import java.util.Optional;
 public interface AccountSignatureRepository extends JpaRepository<AccountSignature, AccountSignaturePK> {
     public List<AccountSignature> findByPkIdentificationTypeAndPkIdentification(String identificationType, String identification);
 
+    public List<AccountSignature> findByPkCodeLocalAccountAndPkCodeInternationalAccount
+            (String codeLocalAccount, String codeInternationalAccount);
+
 }
