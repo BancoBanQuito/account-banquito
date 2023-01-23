@@ -110,6 +110,31 @@ public class AccountController {
         }
     }
 
+    @GetMapping(value = "/code/{codeLocalAccount}")
+    public ResponseEntity<RSFormat> getAccountByCode(
+            @PathVariable("codeLocalAccount") String codeLocalAccount) {
+        try {
+
+            if (Utils.isNullEmpty(codeLocalAccount)) {
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
+                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
+            }
+
+            Account account = accountService.findAccountByCodeLocalAccount(codeLocalAccount);
+
+            return ResponseEntity.status(RSCode.SUCCESS.code).
+                    body(RSFormat.builder().message("Success").data(AccountMapper.mapAccount(account)).build());
+
+        } catch (RSRuntimeException e) {
+            return ResponseEntity.status(e.getCode())
+                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
+        }
+    }
+
     @PutMapping(value = "/code/{codeLocalAccount}/{codeInternationalAccount}/status")
     public ResponseEntity<RSFormat> updateAccountStatus(
             @PathVariable("codeLocalAccount") String codeLocalAccount,

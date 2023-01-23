@@ -139,6 +139,16 @@ public class AccountService {
         return opAccount.get();
     }
 
+    public Account findAccountByCodeLocalAccount(String codeLocalAccount){
+        Optional<Account> opAccount = accountRepository.findByPkCodeLocalAccount(codeLocalAccount);
+
+        if(!opAccount.isPresent()){
+            throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
+        }
+
+        return opAccount.get();
+    }
+
     @Transactional
     public void updateAccountStatus(String codeLocalAccount, String codeInternationalAccount, String status){
 
