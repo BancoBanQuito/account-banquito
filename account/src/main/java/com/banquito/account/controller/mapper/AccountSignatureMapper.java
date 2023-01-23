@@ -27,6 +27,7 @@ public class AccountSignatureMapper {
                 .name(name)
                 .role(signature.getRole())
                 .status(signature.getStatus())
+                .signature(signature.getSignatureReference())
                 .build();
     }
 
