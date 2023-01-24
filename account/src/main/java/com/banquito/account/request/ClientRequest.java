@@ -11,6 +11,7 @@ public class ClientRequest {
     private static RestTemplate restTemplate = new RestTemplate();
     private static final String client = "http://localhost:9003/api/client";
 
+    //private static final String client = "/api/client";
     public static RSClientSignature getClientData(String typeIdentification, String identification){
 
         String url = client.concat("/signature/{typeIdentification}/{identification}");

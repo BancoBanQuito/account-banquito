@@ -17,6 +17,7 @@ public class TransactionRequest {
 
     private static RestTemplate restTemplate = new RestTemplate();
     private static final String transaction = "http://localhost:9002/api/transaction";
+    //private static final String transaction = "https://c2a6-190-63-97-92.ngrok.io/api/transaction";
 
     public static RSTransaction createTransaction(RQTransaction rqTransaction){
 

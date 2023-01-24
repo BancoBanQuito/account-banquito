@@ -46,7 +46,8 @@ public class AccountStatementLogService {
         pk.setCodeLocalAccount(codeLocalAccount);
         pk.setCodeInternationalAccount(codeInternationalAccount);
 
-        Optional<Account> opAccount = accountRepository.findById(pk);
+        //Optional<Account> opAccount = accountRepository.findById(pk);
+        Optional<Account> opAccount = accountRepository.findByPkCodeLocalAccount(codeLocalAccount);
 
         if(!opAccount.isPresent()){
             throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);

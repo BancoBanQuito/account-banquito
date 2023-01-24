@@ -14,4 +14,5 @@ public interface AccountRepository extends JpaRepository<Account, AccountPK> {
     List<Account> findByCodeProductAndCodeProductType(String codeProduct, String codeProductType);
 
     Optional<Account> findByPkCodeLocalAccount(String codeLocalAccount);
+
 }
