@@ -3,6 +3,7 @@ package com.banquito.account.service;
 import com.banquito.account.controller.dto.RSSignature;
 import com.banquito.account.controller.mapper.AccountSignatureMapper;
 import com.banquito.account.exception.RSRuntimeException;
+import com.banquito.account.model.Account;
 import com.banquito.account.model.AccountSignature;
 import com.banquito.account.model.AccountSignaturePK;
 import com.banquito.account.repository.AccountSignatureRepository;
@@ -51,17 +52,12 @@ public class AccountSignatureService {
     }
 
     @Transactional
-    public void updateSignatureRoleStatus(SignatureUpdate signature){
+    public void updateSignatureRoleStatus(
+            String identificationType,  String identification, String codeLocalAccount, String role, String status){
 
-        //get requested record
-        Optional<AccountSignature> opAccountSignature = accountSignatureRepository.findById(
-                AccountSignaturePK.builder()
-                        .identificationType(signature.getIdentificationType())
-                        .identification(signature.getIdentification())
-                        .codeInternationalAccount(signature.getCodeInternationalAccount())
-                        .codeLocalAccount(signature.getCodeLocalAccount())
-                        .build()
-        );
+        Optional<AccountSignature> opAccountSignature = accountSignatureRepository
+                .findByPkIdentificationTypeAndPkIdentificationAndPkCodeLocalAccount(
+                        identificationType, identification,codeLocalAccount);
 
         //verified record exist
         if(!opAccountSignature.isPresent()){
@@ -69,8 +65,8 @@ public class AccountSignatureService {
         }
 
         AccountSignature accountSignature = opAccountSignature.get();
-        accountSignature.setRole(signature.getRole());
-        accountSignature.setStatus(signature.getStatus());
+        accountSignature.setRole(role);
+        accountSignature.setStatus(status);
 
         //update record
         try {
@@ -111,10 +107,12 @@ public class AccountSignatureService {
     }
 
 
-    public List<RSSignature> findSignaturesByCode(String codeLocalAccount, String codeInternationalAccount){
+    public List<RSSignature> findSignaturesByCode(String codeLocalAccount){
 
-        List<AccountSignature> dbSignatures = accountSignatureRepository.findByPkCodeLocalAccountAndPkCodeInternationalAccount(
-                codeLocalAccount, codeInternationalAccount);
+        /*List<AccountSignature> dbSignatures = accountSignatureRepository.findByPkCodeLocalAccountAndPkCodeInternationalAccount(
+                codeLocalAccount, codeInternationalAccount);*/
+
+        List<AccountSignature> dbSignatures = accountSignatureRepository.findByPkCodeLocalAccount(codeLocalAccount);
 
         if(dbSignatures.size() < 1){
             throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);

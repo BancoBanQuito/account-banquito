@@ -71,18 +71,14 @@ public class AccountSignatureController {
                     .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
         }
     }
-    @GetMapping(value = "/code/{codeLocalAccount}/{codeInternationalAccount}")
-    public ResponseEntity<RSFormat> getSignatureListByCode(
-            @PathVariable("codeLocalAccount") String codeLocalAccount,
-            @PathVariable("codeInternationalAccount") String codeInternationalAccount
-    ){
+    @GetMapping(value = "/code/{codeLocalAccount}")
+    public ResponseEntity<RSFormat> getSignatureListByCode(@PathVariable("codeLocalAccount") String codeLocalAccount){
         try {
-            if(Utils.isNullEmpty(codeLocalAccount) || Utils.isNullEmpty(codeInternationalAccount)){
+            if(Utils.isNullEmpty(codeLocalAccount)){
                 return ResponseEntity.status(RSCode.BAD_REQUEST.code)
                         .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
             }
-            List<RSSignature> signatures = accountSignatureService.findSignaturesByCode(
-                    codeLocalAccount, codeInternationalAccount);
+            List<RSSignature> signatures = accountSignatureService.findSignaturesByCode(codeLocalAccount);
             return ResponseEntity.status(RSCode.CREATED.code)
                     .body(RSFormat.builder().message("Success").data(signatures).build());
 
@@ -96,30 +92,29 @@ public class AccountSignatureController {
         }
     }
 
-    @PutMapping(value = "/{identificationType}/{identification}/{codeLocalAccount}/{codeInternationalAccount}")
+    @PutMapping(value = "/{identificationType}/{identification}/{codeLocalAccount}")
     public ResponseEntity<RSFormat> updateSignatureStatus(
             @PathVariable("identificationType") String identificationType,
             @PathVariable("identification") String identification,
             @PathVariable("codeLocalAccount") String codeLocalAccount,
-            @PathVariable("codeInternationalAccount") String codeInternationalAccount,
             @RequestBody RQSignatureRoleStatus signatureRoleStatus) {
         try {
 
-            SignatureUpdate signature = SignatureUpdate.builder()
-                    .identificationType(identificationType)
-                    .identification(identification)
-                    .codeLocalAccount(codeLocalAccount)
-                    .codeInternationalAccount(codeInternationalAccount)
-                    .role(signatureRoleStatus.getRole())
-                    .status(signatureRoleStatus.getStatus())
-                    .build();
-
-            if(!Utils.hasAllAttributes(signature)){
+            if(!Utils.hasAllAttributes(signatureRoleStatus)
+                    || Utils.isNullEmpty(identificationType)
+                    || Utils.isNullEmpty(identification)
+                    || Utils.isNullEmpty(codeLocalAccount)){
                 return ResponseEntity.status(RSCode.BAD_REQUEST.code)
                         .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
             }
 
-            accountSignatureService.updateSignatureRoleStatus(signature);
+            accountSignatureService.updateSignatureRoleStatus(
+                    identificationType,
+                    identification,
+                    codeLocalAccount,
+                    signatureRoleStatus.getRole(),
+                    signatureRoleStatus.getStatus()
+            );
             return ResponseEntity.status(RSCode.CREATED.code)
                     .body(RSFormat.builder().message("Success").data(Messages.SIGNATURE_UPDATED).build());
 

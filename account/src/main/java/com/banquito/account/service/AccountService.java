@@ -124,22 +124,8 @@ public class AccountService {
         }
     }
 
-    public Account findAccountByCode(String codeLocalAccount, String codeInternationalAccount){
-        Optional<Account> opAccount = accountRepository.findById(
-                AccountPK.builder()
-                        .codeLocalAccount(codeLocalAccount)
-                        .codeInternationalAccount(codeInternationalAccount)
-                        .build()
-        );
+    public Account findAccountByCode(String codeLocalAccount){
 
-        if(!opAccount.isPresent()){
-            throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
-        }
-
-        return opAccount.get();
-    }
-
-    public Account findAccountByCodeLocalAccount(String codeLocalAccount){
         Optional<Account> opAccount = accountRepository.findByPkCodeLocalAccount(codeLocalAccount);
 
         if(!opAccount.isPresent()){
@@ -149,15 +135,11 @@ public class AccountService {
         return opAccount.get();
     }
 
-    @Transactional
-    public void updateAccountStatus(String codeLocalAccount, String codeInternationalAccount, String status){
 
-        Optional<Account> opAccount = accountRepository.findById(
-                AccountPK.builder()
-                        .codeLocalAccount(codeLocalAccount)
-                        .codeInternationalAccount(codeInternationalAccount)
-                        .build()
-        );
+    @Transactional
+    public void updateAccountStatus(String codeLocalAccount, String status){
+
+        Optional<Account> opAccount = accountRepository.findByPkCodeLocalAccount(codeLocalAccount);
 
         if(!opAccount.isPresent()){
             throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
@@ -167,8 +149,7 @@ public class AccountService {
 
         account.setStatus(status);
 
-        List<AccountAssociatedService> services = accountAssociatedServiceRepository.
-                findByPkCodeLocalAccountAndPkCodeInternationalAccount(codeLocalAccount,codeInternationalAccount);
+        List<AccountAssociatedService> services = accountAssociatedServiceRepository.findByPkCodeLocalAccount(codeLocalAccount);
 
         if(services.size() > 0){
             if(status.equals("BLO")||status.equals("SUS")||status.equals("INA")){
@@ -191,15 +172,9 @@ public class AccountService {
     }
 
     @Transactional
-    public void updateAccountBalance(String codeLocalAccount, String codeInternationalAccount,
-                                     BigDecimal presentBalance,BigDecimal availableBalance){
+    public void updateAccountBalance(String codeLocalAccount, BigDecimal presentBalance,BigDecimal availableBalance){
 
-        Optional<Account> opAccount = accountRepository.findById(
-                AccountPK.builder()
-                        .codeLocalAccount(codeLocalAccount)
-                        .codeInternationalAccount(codeInternationalAccount)
-                        .build()
-        );
+        Optional<Account> opAccount = accountRepository.findByPkCodeLocalAccount(codeLocalAccount);
 
         if(!opAccount.isPresent()){
             throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);

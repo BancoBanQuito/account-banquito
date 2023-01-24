@@ -27,18 +27,16 @@ public class AccountStatementLogController {
         this.accountStatementLogService = accountStatementLogService;
     }
 
-    @GetMapping("/current/{codeLocalAccount}/{codeInternationalAccount}")
-    public ResponseEntity<RSFormat> findCurrentAccountStatement(
-            @PathVariable("codeLocalAccount") String codeLocalAccount,
-            @PathVariable("codeInternationalAccount") String codeInternationalAccount) {
+    @GetMapping("/current/{codeLocalAccount}")
+    public ResponseEntity<RSFormat> findCurrentAccountStatement(@PathVariable("codeLocalAccount") String codeLocalAccount) {
         try {
-            if (Utils.isNullEmpty(codeLocalAccount) || Utils.isNullEmpty(codeInternationalAccount)) {
+            if (Utils.isNullEmpty(codeLocalAccount)) {
                 return ResponseEntity.status(RSCode.BAD_REQUEST.code)
                         .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
             }
 
             RSAccountStatement responseAccountStatement = this.accountStatementLogService
-                    .findCurrentAccountStatement(codeLocalAccount, codeInternationalAccount);
+                    .findCurrentAccountStatement(codeLocalAccount);
 
             return ResponseEntity.status(RSCode.SUCCESS.code)
                     .body(RSFormat.builder().message("Success").data(responseAccountStatement).build());
@@ -51,18 +49,16 @@ public class AccountStatementLogController {
         }
     }
 
-    @GetMapping("/list/{codeLocalAccount}/{codeInternationalAccount}")
-    public ResponseEntity<RSFormat> findAccountStatementList(
-            @PathVariable("codeLocalAccount") String codeLocalAccount,
-            @PathVariable("codeInternationalAccount") String codeInternationalAccount) {
+    @GetMapping("/list/{codeLocalAccount}")
+    public ResponseEntity<RSFormat> findAccountStatementList(@PathVariable("codeLocalAccount") String codeLocalAccount) {
         try {
-            if (Utils.isNullEmpty(codeLocalAccount) || Utils.isNullEmpty(codeInternationalAccount)) {
+            if (Utils.isNullEmpty(codeLocalAccount)) {
                 return ResponseEntity.status(RSCode.BAD_REQUEST.code)
                         .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
             }
 
             List<RSAccountStatementList> response = accountStatementLogService.findAccountStatementList(
-                    codeLocalAccount, codeInternationalAccount);
+                    codeLocalAccount);
 
             return ResponseEntity.status(RSCode.SUCCESS.code)
                     .body(RSFormat.builder().message("Success").data(response).build());

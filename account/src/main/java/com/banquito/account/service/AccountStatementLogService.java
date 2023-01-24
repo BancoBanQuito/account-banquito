@@ -40,13 +40,8 @@ public class AccountStatementLogService {
         this.accountRepository = accountRepository;
     }
 
-    public RSAccountStatement findCurrentAccountStatement(String codeLocalAccount, String codeInternationalAccount) {
+    public RSAccountStatement findCurrentAccountStatement(String codeLocalAccount) {
 
-        AccountPK pk = new AccountPK();
-        pk.setCodeLocalAccount(codeLocalAccount);
-        pk.setCodeInternationalAccount(codeInternationalAccount);
-
-        //Optional<Account> opAccount = accountRepository.findById(pk);
         Optional<Account> opAccount = accountRepository.findByPkCodeLocalAccount(codeLocalAccount);
 
         if(!opAccount.isPresent()){
@@ -64,10 +59,10 @@ public class AccountStatementLogService {
         return findAccountStatementTransactions(accountStatementLog, accountStatement);
     }
 
-    public List<RSAccountStatementList> findAccountStatementList(String codeLocalAccount, String codeInternationalAccount){
+    public List<RSAccountStatementList> findAccountStatementList(String codeLocalAccount){
 
-        List<AccountStatementLog> dbAccountStatements = accountStatementLogRepository.findByPkCodeLocalAccountAndPkCodeInternationalAccount(
-                codeLocalAccount, codeInternationalAccount
+        List<AccountStatementLog> dbAccountStatements = accountStatementLogRepository.findByPkCodeLocalAccount(
+                codeLocalAccount
         );
 
         List<RSAccountStatementList> accountStatements = new ArrayList<>();
