@@ -36,126 +36,105 @@ public class AccountController {
     }
 
     @PostMapping
-    public ResponseEntity<RSFormat> createAccount(@RequestBody RQCreateAccount account) {
+    public ResponseEntity<RSFormat<RSCreateAccount>> createAccount(@RequestBody RQCreateAccount account) {
         try {
 
             if (!Utils.hasAllAttributes(account)) {
-                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
-                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code).build();
             }
 
             Account savedAccount = accountService.createAccount(AccountMapper.map(account), account.getIdentification(), account.getIdentificationType());
             RSCreateAccount responseAccount = AccountMapper.map(savedAccount);
             return ResponseEntity.status(RSCode.CREATED.code)
-                    .body(RSFormat.builder().message("Success").data(responseAccount).build());
+                    .body(RSFormat.<RSCreateAccount>builder().message("Success").data(responseAccount).build());
 
         } catch (RSRuntimeException e) {
-            return ResponseEntity.status(e.getCode())
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
-
+            return ResponseEntity.status(e.getCode()).build();
         } catch (Exception e) {
-            return ResponseEntity.status(RSCode.INTERNAL_SERVER_ERROR.code)
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
+            return ResponseEntity.status(500).build();
         }
     }
 
     @GetMapping(value = "/id/{identificationType}/{identification}")
-    public ResponseEntity<RSFormat> getConsolidateAccounts(
+    public ResponseEntity<RSFormat<List<RSAccount>>> getConsolidateAccounts(
             @PathVariable("identificationType") String identificationType,
             @PathVariable("identification") String identification) {
         try {
 
             if (Utils.isNullEmpty(identificationType) || Utils.isNullEmpty(identification)) {
-                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
-                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code).build();
             }
 
             List<RSAccount> rsAccounts = this.accountService.findAllAccountsByClient(identificationType, identification);
             return ResponseEntity.status(RSCode.SUCCESS.code).
-                    body(RSFormat.builder().message("Success").data(rsAccounts).build());
+                    body(RSFormat.<List<RSAccount>>builder().message("Success").data(rsAccounts).build());
 
         } catch (RSRuntimeException e) {
-            return ResponseEntity.status(e.getCode())
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
-
+            return ResponseEntity.status(e.getCode()).build();
         } catch (Exception e) {
-            return ResponseEntity.status(RSCode.INTERNAL_SERVER_ERROR.code)
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
+            return ResponseEntity.status(500).build();
         }
     }
 
     @GetMapping(value = "/code/{codeLocalAccount}")
-    public ResponseEntity<RSFormat> getAccountByCode(@PathVariable("codeLocalAccount") String codeLocalAccount) {
+    public ResponseEntity<RSFormat<RSAccount>> getAccountByCode(@PathVariable("codeLocalAccount") String codeLocalAccount) {
         try {
 
             if (Utils.isNullEmpty(codeLocalAccount)) {
-                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
-                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code).build();
             }
 
             Account account = accountService.findAccountByCode(codeLocalAccount);
 
             return ResponseEntity.status(RSCode.SUCCESS.code).
-                    body(RSFormat.builder().message("Success").data(AccountMapper.mapAccount(account)).build());
+                    body(RSFormat.<RSAccount>builder().message("Success").data(AccountMapper.mapAccount(account)).build());
 
         } catch (RSRuntimeException e) {
-            return ResponseEntity.status(e.getCode())
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
-
+            return ResponseEntity.status(e.getCode()).build();
         } catch (Exception e) {
-            return ResponseEntity.status(500)
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
+            return ResponseEntity.status(500).build();
         }
     }
 
     @PutMapping(value = "/code/{codeLocalAccount}/status")
-    public ResponseEntity<RSFormat> updateAccountStatus(
+    public ResponseEntity<RSFormat<String>> updateAccountStatus(
             @PathVariable("codeLocalAccount") String codeLocalAccount,
             @RequestBody RQAccountStatus status) {
         try {
             if (!Utils.hasAllAttributes(status) || Utils.isNullEmpty(codeLocalAccount)) {
-                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
-                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code).build();
             }
 
             accountService.updateAccountStatus(codeLocalAccount,status.getStatus());
             return ResponseEntity.status(RSCode.CREATED.code)
-                    .body(RSFormat.builder().message("Success").data(Messages.SIGNATURE_UPDATED).build());
-
+                    .body(RSFormat.<String>builder().message("Success").data(Messages.SIGNATURE_UPDATED).build());
         } catch (RSRuntimeException e) {
-            return ResponseEntity.status(e.getCode())
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
-
+            return ResponseEntity.status(e.getCode()).build();
         } catch (Exception e) {
-            return ResponseEntity.status(RSCode.INTERNAL_SERVER_ERROR.code)
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
+            return ResponseEntity.status(500).build();
         }
     }
 
 
     @PutMapping(value = "/code/{codeLocalAccount}/balance")
-    public ResponseEntity<RSFormat> updateAccountBalance(
+    public ResponseEntity<RSFormat<String>> updateAccountBalance(
             @PathVariable("codeLocalAccount") String codeLocalAccount,
             @RequestBody RQAccountBalance balance) {
         try {
             if (!Utils.hasAllAttributes(balance) || Utils.isNullEmpty(codeLocalAccount)) {
-                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
-                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code).build();
             }
             accountService.updateAccountBalance(
                     codeLocalAccount,
                     balance.getPresentBalance(),
                     balance.getAvailableBalance());
             return ResponseEntity.status(RSCode.CREATED.code)
-                    .body(RSFormat.builder().message("Success").data(Messages.ACCOUNT_UPDATED).build());
+                    .body(RSFormat.<String>builder().message("Success").data(Messages.ACCOUNT_UPDATED).build());
 
         } catch (RSRuntimeException e) {
-            return ResponseEntity.status(e.getCode())
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
-
+            return ResponseEntity.status(e.getCode()).build();
         } catch (Exception e) {
-            return ResponseEntity.status(RSCode.INTERNAL_SERVER_ERROR.code)
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
+            return ResponseEntity.status(500).build();
         }
     }
 

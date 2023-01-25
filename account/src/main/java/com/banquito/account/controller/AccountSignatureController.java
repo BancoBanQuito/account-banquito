@@ -28,72 +28,59 @@ public class AccountSignatureController {
     }
 
     @PostMapping
-    public ResponseEntity<RSFormat> createSignature(@RequestBody RQSignature signature) {
+    public ResponseEntity<RSFormat<String>> createSignature(@RequestBody RQSignature signature) {
         try {
             if(!Utils.hasAllAttributes(signature)){
-                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
-                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code).build();
             }
             accountSignatureService.createSignature(AccountSignatureMapper.map(signature));
             return ResponseEntity.status(RSCode.CREATED.code)
-                    .body(RSFormat.builder().message("Success").data(Messages.SIGNATURE_CREATED).build());
+                    .body(RSFormat.<String>builder().message("Success").data(Messages.SIGNATURE_CREATED).build());
 
         } catch (RSRuntimeException e) {
-            return ResponseEntity.status(e.getCode())
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
-
+            return ResponseEntity.status(e.getCode()).build();
         } catch (Exception e) {
-            return ResponseEntity.status(RSCode.INTERNAL_SERVER_ERROR.code)
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
+            return ResponseEntity.status(500).build();
         }
     }
 
     @GetMapping(value = "/id/{identificationType}/{identification}")
-    public ResponseEntity<RSFormat> getSignatureListById(
+    public ResponseEntity<RSFormat<List<RSSignature>>> getSignatureListById(
             @PathVariable("identificationType") String identificationType,
             @PathVariable("identification") String identification
             ){
         try {
             if(Utils.isNullEmpty(identificationType) || Utils.isNullEmpty(identification)){
-                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
-                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code).build();
             }
             List<RSSignature> signatures = accountSignatureService.findSignaturesById(identificationType, identification);
             return ResponseEntity.status(RSCode.CREATED.code)
-                    .body(RSFormat.builder().message("Success").data(signatures).build());
-
+                    .body(RSFormat.<List<RSSignature>>builder().message("Success").data(signatures).build());
         } catch (RSRuntimeException e) {
-            return ResponseEntity.status(e.getCode())
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
-
+            return ResponseEntity.status(e.getCode()).build();
         } catch (Exception e) {
-            return ResponseEntity.status(RSCode.INTERNAL_SERVER_ERROR.code)
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
+            return ResponseEntity.status(500).build();
         }
     }
     @GetMapping(value = "/code/{codeLocalAccount}")
-    public ResponseEntity<RSFormat> getSignatureListByCode(@PathVariable("codeLocalAccount") String codeLocalAccount){
+    public ResponseEntity<RSFormat<List<RSSignature>>> getSignatureListByCode(@PathVariable("codeLocalAccount") String codeLocalAccount){
         try {
             if(Utils.isNullEmpty(codeLocalAccount)){
-                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
-                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code).build();
             }
             List<RSSignature> signatures = accountSignatureService.findSignaturesByCode(codeLocalAccount);
             return ResponseEntity.status(RSCode.CREATED.code)
-                    .body(RSFormat.builder().message("Success").data(signatures).build());
+                    .body(RSFormat.<List<RSSignature>>builder().message("Success").data(signatures).build());
 
         } catch (RSRuntimeException e) {
-            return ResponseEntity.status(e.getCode())
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
-
+            return ResponseEntity.status(e.getCode()).build();
         } catch (Exception e) {
-            return ResponseEntity.status(RSCode.INTERNAL_SERVER_ERROR.code)
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
+            return ResponseEntity.status(500).build();
         }
     }
 
     @PutMapping(value = "/{identificationType}/{identification}/{codeLocalAccount}")
-    public ResponseEntity<RSFormat> updateSignatureStatus(
+    public ResponseEntity<RSFormat<String>> updateSignatureStatus(
             @PathVariable("identificationType") String identificationType,
             @PathVariable("identification") String identification,
             @PathVariable("codeLocalAccount") String codeLocalAccount,
@@ -104,8 +91,7 @@ public class AccountSignatureController {
                     || Utils.isNullEmpty(identificationType)
                     || Utils.isNullEmpty(identification)
                     || Utils.isNullEmpty(codeLocalAccount)){
-                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
-                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code).build();
             }
 
             accountSignatureService.updateSignatureRoleStatus(
@@ -116,15 +102,12 @@ public class AccountSignatureController {
                     signatureRoleStatus.getStatus()
             );
             return ResponseEntity.status(RSCode.CREATED.code)
-                    .body(RSFormat.builder().message("Success").data(Messages.SIGNATURE_UPDATED).build());
+                    .body(RSFormat.<String>builder().message("Success").data(Messages.SIGNATURE_UPDATED).build());
 
         } catch (RSRuntimeException e) {
-            return ResponseEntity.status(e.getCode())
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
-
+            return ResponseEntity.status(e.getCode()).build();
         } catch (Exception e) {
-            return ResponseEntity.status(RSCode.INTERNAL_SERVER_ERROR.code)
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
+            return ResponseEntity.status(500).build();
         }
     }
 }
