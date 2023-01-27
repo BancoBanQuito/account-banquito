@@ -1,27 +1,35 @@
 package com.banquito.account.request;
 
 import com.banquito.account.request.dto.*;
+import com.banquito.account.utils.Transaction;
 import com.banquito.account.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Service
 public class TransactionRequest {
 
+    private final Transaction transactionProperties;
     private static RestTemplate restTemplate = new RestTemplate();
-    private static final String transaction = "http://localhost:9002/api/transaction";
-    //private static final String transaction = "https://c2a6-190-63-97-92.ngrok.io/api/transaction";
 
-    public static RSTransaction createTransaction(RQTransaction rqTransaction){
+    public TransactionRequest(Transaction transactionProperties) {
+        this.transactionProperties = transactionProperties;
+    }
 
-        String url = transaction;
+    public RSTransaction createTransaction(RQTransaction rqTransaction){
+
+        String url = transactionProperties.getValue();
 
         // create headers
         HttpHeaders headers = new HttpHeaders();
@@ -58,9 +66,9 @@ public class TransactionRequest {
         return null;
     }
 
-    public static List<RSTransaction> getTransactionsBetweenDates(String codeLocalAccount, LocalDateTime from, LocalDateTime to){
+    public List<RSTransaction> getTransactionsBetweenDates(String codeLocalAccount, LocalDateTime from, LocalDateTime to){
 
-        String url = transaction.concat("/{codeLocalAccount}/{from}/{to}");
+        String url = transactionProperties.getValue().concat("/{codeLocalAccount}/{from}/{to}");
 
         ResponseEntity<RSGeneric> response = restTemplate.getForEntity(
                 url,
@@ -82,9 +90,9 @@ public class TransactionRequest {
         return Collections.emptyList();
     }
 
-    public static RSInterest createSavingsAccountInterest(RQInterest rqInterest){
+    public RSInterest createSavingsAccountInterest(RQInterest rqInterest){
 
-        String url = transaction.concat("/interest");
+        String url = transactionProperties.getValue().concat("/interest");
 
         // create headers
         HttpHeaders headers = new HttpHeaders();
@@ -115,9 +123,9 @@ public class TransactionRequest {
         return null;
     }
 
-    public static List<RSInterest> getInterestBetweenDates(String codeLocalAccount, LocalDateTime from, LocalDateTime to){
+    public List<RSInterest> getInterestBetweenDates(String codeLocalAccount, LocalDateTime from, LocalDateTime to){
 
-        String url = transaction.concat("/interest/{codeLocalAccount}/{from}/{to}");
+        String url = transactionProperties.getValue().concat("/interest/{codeLocalAccount}/{from}/{to}");
 
         ResponseEntity<RSGeneric> response = restTemplate.getForEntity(
                 url,
@@ -139,9 +147,9 @@ public class TransactionRequest {
         return Collections.emptyList();
     }
 
-    public static RSInvestment getInvestmentInterest(String codeLocalAccount, Integer days, BigDecimal capital, BigDecimal aer){
+    public RSInvestment getInvestmentInterest(String codeLocalAccount, Integer days, BigDecimal capital, BigDecimal aer){
 
-        String url = transaction.concat("/interest/investment/{codeLocalAccount}/{days}/{capital}/{ear}");
+        String url = transactionProperties.getValue().concat("/interest/investment/{codeLocalAccount}/{days}/{capital}/{ear}");
 
         ResponseEntity<RSGeneric> response = restTemplate.getForEntity(
                 url,

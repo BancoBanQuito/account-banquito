@@ -6,6 +6,7 @@ import com.banquito.account.exception.RSRuntimeException;
 import com.banquito.account.model.Account;
 import com.banquito.account.model.AccountSignature;
 import com.banquito.account.model.AccountSignaturePK;
+import com.banquito.account.repository.AccountRepository;
 import com.banquito.account.repository.AccountSignatureRepository;
 import com.banquito.account.request.ClientRequest;
 import com.banquito.account.request.dto.RSClientSignature;
@@ -22,24 +23,44 @@ import java.util.Optional;
 @Service
 public class AccountSignatureService {
     private final AccountSignatureRepository accountSignatureRepository;
+    private final AccountRepository accountRepository;
+    private final ClientRequest clientRequest;
 
-    public AccountSignatureService(AccountSignatureRepository accountSignatureRepository){
+    public AccountSignatureService(AccountSignatureRepository accountSignatureRepository,
+                                   AccountRepository accountRepository,
+                                   ClientRequest clientRequest){
         this.accountSignatureRepository = accountSignatureRepository;
+        this.accountRepository = accountRepository;
+        this.clientRequest = clientRequest;
     }
 
     @Transactional
     public void createSignature(AccountSignature accountSignature){
 
         //api call to client module
-        RSClientSignature signature = ClientRequest.getClientData(
+        RSClientSignature clientData = clientRequest.getClientData(
                 accountSignature.getPk().getIdentificationType(), accountSignature.getPk().getIdentification());
 
-        if(signature == null){
+        if(clientData == null){
             throw new RSRuntimeException(Messages.CLIENT_NOT_FOUND, RSCode.BAD_REQUEST);
         }
 
-        //set missing params
-        accountSignature.setSignatureReference(signature.getSignature());
+        //account is required to get international code
+        Optional<Account> opAccount = accountRepository.findByPkCodeLocalAccount(
+                accountSignature.getPk().getCodeLocalAccount());
+
+        if(!opAccount.isPresent()){
+            throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
+        }
+
+        Account account = opAccount.get();
+
+        AccountSignaturePK tempPk = accountSignature.getPk();
+        tempPk.setCodeInternationalAccount(account.getPk().getCodeInternationalAccount());
+
+        //set params
+        accountSignature.setPk(tempPk);
+        accountSignature.setSignatureReference(clientData.getSignature());
         accountSignature.setCreateDate(Utils.currentDate());
         accountSignature.setStatus(Status.ACTIVATE.code);
 
@@ -87,7 +108,7 @@ public class AccountSignatureService {
         }
 
         //Call api for client name
-        RSClientSignature clientSignature = ClientRequest.getClientData(identificationType,identification);
+        RSClientSignature clientSignature = clientRequest.getClientData(identificationType,identification);
 
         if(clientSignature == null){
             throw new RSRuntimeException(Messages.CLIENT_NOT_FOUND, RSCode.BAD_REQUEST);
@@ -121,7 +142,7 @@ public class AccountSignatureService {
         List<RSSignature> signatures = new ArrayList<>();
         RSSignature signature;
         for(AccountSignature dbSignature: dbSignatures){
-            RSClientSignature clientSignature = ClientRequest.getClientData(
+            RSClientSignature clientSignature = clientRequest.getClientData(
                     dbSignature.getPk().getIdentificationType(),dbSignature.getPk().getIdentification());
 
             if(clientSignature == null){

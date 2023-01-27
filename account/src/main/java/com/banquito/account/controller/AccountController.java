@@ -1,9 +1,6 @@
 package com.banquito.account.controller;
 
 import com.banquito.account.controller.dto.*;
-import com.banquito.account.request.TransactionRequest;
-import com.banquito.account.request.dto.RQInterest;
-import com.banquito.account.request.dto.RQTransaction;
 import com.banquito.account.utils.Messages;
 import com.banquito.account.utils.RSCode;
 import com.banquito.account.utils.RSFormat;
@@ -15,15 +12,6 @@ import com.banquito.account.utils.Utils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -88,6 +76,26 @@ public class AccountController {
 
             return ResponseEntity.status(RSCode.SUCCESS.code).
                     body(RSFormat.<RSAccount>builder().message("Success").data(AccountMapper.mapAccount(account)).build());
+
+        } catch (RSRuntimeException e) {
+            return ResponseEntity.status(e.getCode()).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    @GetMapping(value = "/code/{codeLocalAccount}/type")
+    public ResponseEntity<RSFormat<RSProductTypeAndClientName>> getAccountProductTypeAndClientName(@PathVariable("codeLocalAccount") String codeLocalAccount) {
+        try {
+
+            if (Utils.isNullEmpty(codeLocalAccount)) {
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code).build();
+            }
+
+            RSProductTypeAndClientName response = accountService.getAccountProductTypeAndClientName(codeLocalAccount);
+
+            return ResponseEntity.status(RSCode.SUCCESS.code).
+                    body(RSFormat.<RSProductTypeAndClientName>builder().message("Success").data(response).build());
 
         } catch (RSRuntimeException e) {
             return ResponseEntity.status(e.getCode()).build();

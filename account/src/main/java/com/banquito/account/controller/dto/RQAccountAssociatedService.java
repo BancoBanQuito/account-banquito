@@ -13,8 +13,6 @@ public class RQAccountAssociatedService {
 
     private String codeLocalAccount;
 
-    private String codeInternationalAccount;
-
     private String codeProduct;
 
     private String codeProductType;

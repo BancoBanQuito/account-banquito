@@ -1,20 +1,27 @@
 package com.banquito.account.request;
 
 import com.banquito.account.request.dto.RSClientSignature;
+import com.banquito.account.utils.Client;
 import com.banquito.account.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+@Service
 public class ClientRequest {
 
+    private final Client clientProperties;
+
     private static RestTemplate restTemplate = new RestTemplate();
-    private static final String client = "http://localhost:9003/api/client";
 
-    //private static final String client = "/api/client";
-    public static RSClientSignature getClientData(String typeIdentification, String identification){
+    public ClientRequest(Client clientProperties) {
+        this.clientProperties = clientProperties;
+    }
 
-        String url = client.concat("/signature/{typeIdentification}/{identification}");
+    public RSClientSignature getClientData(String typeIdentification, String identification) {
+
+        String url = clientProperties.getValue().concat("/signature/{typeIdentification}/{identification}");
 
         ResponseEntity<RSClientSignature> response = restTemplate.getForEntity(
                 url,
@@ -29,4 +36,5 @@ public class ClientRequest {
         }
         return null;
     }
+
 }

@@ -21,7 +21,6 @@ public class AccountAssociatedServiceMapper {
 
         AccountAssociatedServicePK pk = new AccountAssociatedServicePK();
         pk.setCodeLocalAccount(rqAccountAssociatedService.getCodeLocalAccount());
-        pk.setCodeInternationalAccount(rqAccountAssociatedService.getCodeInternationalAccount());
         pk.setCodeProduct(rqAccountAssociatedService.getCodeProduct());
         pk.setCodeProductType(rqAccountAssociatedService.getCodeProductType());
         pk.setCodeAssociatedService(rqAccountAssociatedService.getCodeAssociatedService());

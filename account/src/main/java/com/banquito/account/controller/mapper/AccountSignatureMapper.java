@@ -12,11 +12,11 @@ public class AccountSignatureMapper {
         return AccountSignature.builder()
                 .pk(AccountSignaturePK.builder()
                         .codeLocalAccount(signature.getCodeLocalAccount())
-                        .codeInternationalAccount(signature.getCodeInternationalAccount())
                         .identificationType(signature.getIdentificationType())
                         .identification(signature.getIdentification()).build())
                 .startDate(signature.getStartDate())
-                .role(signature.getRole()).build();
+                .role(signature.getRole())
+                .build();
     }
 
     public static RSSignature map(AccountSignature signature, String name){

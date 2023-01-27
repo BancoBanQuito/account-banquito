@@ -1,11 +1,14 @@
 package com.banquito.account.service;
 
 import com.banquito.account.controller.dto.RSAccount;
+import com.banquito.account.controller.dto.RSProductTypeAndClientName;
 import com.banquito.account.exception.RSRuntimeException;
 import com.banquito.account.model.*;
 import com.banquito.account.repository.AccountAssociatedServiceRepository;
 import com.banquito.account.repository.AccountClientRepository;
 import com.banquito.account.repository.AccountRepository;
+import com.banquito.account.request.ClientRequest;
+import com.banquito.account.request.dto.RSClientSignature;
 import com.banquito.account.utils.Messages;
 import com.banquito.account.utils.RSCode;
 import com.banquito.account.utils.Status;
@@ -26,13 +29,16 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final AccountClientRepository accountClientRepository;
     private final AccountAssociatedServiceRepository accountAssociatedServiceRepository;
+    private final ClientRequest clientRequest;
 
     public AccountService(AccountRepository accountRepository,
                           AccountClientRepository accountClientRepository,
-                          AccountAssociatedServiceRepository accountAssociatedServiceRepository) {
+                          AccountAssociatedServiceRepository accountAssociatedServiceRepository,
+                          ClientRequest clientRequest) {
         this.accountRepository = accountRepository;
         this.accountClientRepository = accountClientRepository;
         this.accountAssociatedServiceRepository = accountAssociatedServiceRepository;
+        this.clientRequest = clientRequest;
     }
 
     @Transactional
@@ -135,6 +141,43 @@ public class AccountService {
         return opAccount.get();
     }
 
+    public RSProductTypeAndClientName getAccountProductTypeAndClientName(String codeLocalAccount){
+
+
+        Optional<Account> opAccount = accountRepository.findByPkCodeLocalAccount(codeLocalAccount);
+
+        if(!opAccount.isPresent()){
+            throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
+        }
+
+        Account account = opAccount.get();
+
+        //account client is required to get client id
+        Optional<AccountClient> opClientAccount = accountClientRepository.findByPkCodeLocalAccount(codeLocalAccount);
+
+        if(!opClientAccount.isPresent()){
+            throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
+        }
+
+        AccountClient accountClient = opClientAccount.get();
+
+        //api call to client module
+        RSClientSignature clientData = clientRequest.getClientData(
+                accountClient.getPk().getIdentificationType(), accountClient.getPk().getIdentification());
+
+        if(clientData == null){
+            throw new RSRuntimeException(Messages.CLIENT_NOT_FOUND, RSCode.BAD_REQUEST);
+        }
+
+        return RSProductTypeAndClientName.builder()
+                .codeLocalAccount(codeLocalAccount)
+                .productType(account.getCodeProductType())
+                .product(account.getCodeProduct())
+                .identificationType(accountClient.getPk().getIdentificationType())
+                .identification(accountClient.getPk().getIdentification())
+                .name(clientData.getName() + " " + clientData.getLastName())
+                .build();
+    }
 
     @Transactional
     public void updateAccountStatus(String codeLocalAccount, String status){

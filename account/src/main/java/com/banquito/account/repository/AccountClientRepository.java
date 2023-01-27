@@ -11,5 +11,7 @@ import com.banquito.account.model.AccountClientPK;
 
 @Repository
 public interface AccountClientRepository extends JpaRepository<AccountClient, AccountClientPK> {
-        public List<AccountClient> findByPkIdentificationAndPkIdentificationType(String identification, String identificationType);
+        List<AccountClient> findByPkIdentificationAndPkIdentificationType(String identification, String identificationType);
+
+        Optional<AccountClient> findByPkCodeLocalAccount(String codeLocalAccount);
 }

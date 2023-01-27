@@ -6,7 +6,6 @@ import com.banquito.account.controller.dto.RSAccountStatementTransactions;
 import com.banquito.account.controller.mapper.AccountStatementMapper;
 import com.banquito.account.exception.RSRuntimeException;
 import com.banquito.account.model.Account;
-import com.banquito.account.model.AccountPK;
 import com.banquito.account.model.AccountStatementLog;
 import com.banquito.account.model.AccountStatementLogPK;
 import com.banquito.account.repository.AccountRepository;
@@ -33,11 +32,13 @@ public class AccountStatementLogService {
 
     private final AccountStatementLogRepository accountStatementLogRepository;
     private final AccountRepository accountRepository;
+    private final TransactionRequest transactionRequest;
 
     public AccountStatementLogService(AccountStatementLogRepository accountStatementLogRepository,
-            AccountRepository accountRepository) {
+                                      AccountRepository accountRepository, TransactionRequest transactionRequest) {
         this.accountStatementLogRepository = accountStatementLogRepository;
         this.accountRepository = accountRepository;
+        this.transactionRequest = transactionRequest;
     }
 
     public RSAccountStatement findCurrentAccountStatement(String codeLocalAccount) {
@@ -113,7 +114,7 @@ public class AccountStatementLogService {
         List<RSAccountStatementTransactions> statementTransactions = new ArrayList<>();
         RSAccountStatementTransactions statementTransaction;
 
-        List<RSTransaction> transactions = TransactionRequest.getTransactionsBetweenDates(
+        List<RSTransaction> transactions = transactionRequest.getTransactionsBetweenDates(
                 accountStatementLog.getPk().getCodeLocalAccount(),
                 LocalDateTime.ofInstant(accountStatementLog.getLastCutOffDate().toInstant(), ZoneId.systemDefault()),
                 LocalDateTime.ofInstant(accountStatementLog.getCurrentCutOffDate().toInstant(), ZoneId.systemDefault())
@@ -180,13 +181,13 @@ public class AccountStatementLogService {
             previousBalance = BigDecimal.valueOf(0);
         }
 
-        List<RSTransaction> transactions = TransactionRequest.getTransactionsBetweenDates(
+        List<RSTransaction> transactions = transactionRequest.getTransactionsBetweenDates(
                 account.getPk().getCodeLocalAccount(),
                 lastCutOffDate,
                 currentCutOffDate
         );
 
-        List<RSInterest> dailyBalances = TransactionRequest.getInterestBetweenDates(
+        List<RSInterest> dailyBalances = transactionRequest.getInterestBetweenDates(
                 account.getPk().getCodeLocalAccount(),
                 lastCutOffDate,
                 currentCutOffDate

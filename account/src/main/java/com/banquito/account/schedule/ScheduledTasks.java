@@ -55,12 +55,16 @@ public class ScheduledTasks {
 
     private final AccountStatementLogService accountLogService;
 
+    private final TransactionRequest transactionRequest;
+
     public ScheduledTasks(AccountRepository accountRepository,
                           AccountStatementLogRepository accountLogRepository,
-                          AccountStatementLogService accountLogService){
+                          AccountStatementLogService accountLogService,
+                          TransactionRequest transactionRequest){
         this.accountRepository = accountRepository;
         this.accountLogRepository = accountLogRepository;
         this.accountLogService = accountLogService;
+        this.transactionRequest = transactionRequest;
     }
 
     //Executes every day at 23:55
@@ -83,7 +87,7 @@ public class ScheduledTasks {
                     .availableBalance(account.getAvailableBalance())
                     .build();
 
-            RSInterest responseInterest = TransactionRequest.createSavingsAccountInterest(interest);
+            RSInterest responseInterest = transactionRequest.createSavingsAccountInterest(interest);
 
             if (responseInterest != null) {
                 Utils.saveLog(responseInterest, account.getPk().getCodeLocalAccount());
@@ -98,7 +102,7 @@ public class ScheduledTasks {
                         .value(responseInterest.getValue())
                         .build();
 
-                RSTransaction responseTransaction = TransactionRequest.createTransaction(transaction);
+                RSTransaction responseTransaction = transactionRequest.createTransaction(transaction);
 
                 if(responseTransaction != null){
                     Utils.saveLog(responseTransaction, account.getPk().getCodeLocalAccount());
@@ -126,7 +130,7 @@ public class ScheduledTasks {
                     .availableBalance(account.getAvailableBalance())
                     .build();
 
-            RSInterest responseInterest = TransactionRequest.createSavingsAccountInterest(interest);
+            RSInterest responseInterest = transactionRequest.createSavingsAccountInterest(interest);
 
             if (responseInterest != null) {
                 Utils.saveLog(responseInterest, account.getPk().getCodeLocalAccount());
@@ -158,7 +162,7 @@ public class ScheduledTasks {
 
                 BigDecimal interest = BigDecimal.valueOf(0);
 
-                List<RSInterest> dailyBalances = TransactionRequest.getInterestBetweenDates(
+                List<RSInterest> dailyBalances = transactionRequest.getInterestBetweenDates(
                         account.getPk().getCodeLocalAccount(),
                         firstDayOfMonth,
                         lastDayOfMonth
@@ -180,7 +184,7 @@ public class ScheduledTasks {
                         .value(interest)
                         .build();
 
-                RSTransaction responseTransaction = TransactionRequest.createTransaction(transaction);
+                RSTransaction responseTransaction = transactionRequest.createTransaction(transaction);
 
                 if(responseTransaction != null){
                     Utils.saveLog(responseTransaction, account.getPk().getCodeLocalAccount());
@@ -224,7 +228,7 @@ public class ScheduledTasks {
 
                 long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
 
-                RSInvestment responseInvestment = TransactionRequest.getInvestmentInterest(
+                RSInvestment responseInvestment = transactionRequest.getInvestmentInterest(
                         account.getPk().getCodeLocalAccount(),
                         Math.toIntExact(daysBetween),
                         account.getAvailableBalance(),
@@ -251,7 +255,7 @@ public class ScheduledTasks {
                 .value(responseInvestment.getRawInterest())
                 .build();
 
-        RSTransaction responseCreditTransaction = TransactionRequest.createTransaction(creditTransaction);
+        RSTransaction responseCreditTransaction = transactionRequest.createTransaction(creditTransaction);
 
         if(responseCreditTransaction != null){
             Utils.saveLog(responseCreditTransaction, account.getPk().getCodeLocalAccount());
@@ -266,7 +270,7 @@ public class ScheduledTasks {
                     .value(responseInvestment.getRetention())
                     .build();
 
-            RSTransaction responseDebitTransaction = TransactionRequest.createTransaction(debitTransaction);
+            RSTransaction responseDebitTransaction = transactionRequest.createTransaction(debitTransaction);
 
             if(responseCreditTransaction != null){
                 Utils.saveLog(responseDebitTransaction, account.getPk().getCodeLocalAccount());
