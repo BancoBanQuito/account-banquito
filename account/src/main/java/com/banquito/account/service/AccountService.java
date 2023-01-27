@@ -195,7 +195,7 @@ public class AccountService {
         List<AccountAssociatedService> services = accountAssociatedServiceRepository.findByPkCodeLocalAccount(codeLocalAccount);
 
         if(services.size() > 0){
-            if(status.equals("BLO")||status.equals("SUS")||status.equals("INA")){
+            if(status.equals("ACT")||status.equals("BLO")||status.equals("SUS")||status.equals("INA")){
                 for(AccountAssociatedService service: services){
                     service.setStatus(status);
                     try {

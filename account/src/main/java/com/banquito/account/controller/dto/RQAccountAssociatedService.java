@@ -13,9 +13,9 @@ public class RQAccountAssociatedService {
 
     private String codeLocalAccount;
 
-    private String codeProduct;
-
     private String codeProductType;
+
+    private String codeProduct;
 
     private String codeAssociatedService;
 }
