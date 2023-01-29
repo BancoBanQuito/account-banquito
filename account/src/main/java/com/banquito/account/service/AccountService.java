@@ -7,6 +7,7 @@ import com.banquito.account.model.*;
 import com.banquito.account.repository.AccountAssociatedServiceRepository;
 import com.banquito.account.repository.AccountClientRepository;
 import com.banquito.account.repository.AccountRepository;
+import com.banquito.account.repository.AccountSignatureRepository;
 import com.banquito.account.request.ClientRequest;
 import com.banquito.account.request.dto.RSClientSignature;
 import com.banquito.account.utils.Messages;
@@ -28,15 +29,18 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final AccountClientRepository accountClientRepository;
+    private final AccountSignatureRepository accountSignatureRepository;
     private final AccountAssociatedServiceRepository accountAssociatedServiceRepository;
     private final ClientRequest clientRequest;
 
     public AccountService(AccountRepository accountRepository,
                           AccountClientRepository accountClientRepository,
+                          AccountSignatureRepository accountSignatureRepository,
                           AccountAssociatedServiceRepository accountAssociatedServiceRepository,
                           ClientRequest clientRequest) {
         this.accountRepository = accountRepository;
         this.accountClientRepository = accountClientRepository;
+        this.accountSignatureRepository = accountSignatureRepository;
         this.accountAssociatedServiceRepository = accountAssociatedServiceRepository;
         this.clientRequest = clientRequest;
     }
@@ -195,13 +199,28 @@ public class AccountService {
         List<AccountAssociatedService> services = accountAssociatedServiceRepository.findByPkCodeLocalAccount(codeLocalAccount);
 
         if(services.size() > 0){
-            if(status.equals("ACT")||status.equals("BLO")||status.equals("SUS")||status.equals("INA")){
+            if(status.equals("BLO")||status.equals("SUS")||status.equals("INA")){
                 for(AccountAssociatedService service: services){
                     service.setStatus(status);
                     try {
                         this.accountAssociatedServiceRepository.save(service);
                     } catch (Exception e) {
                         throw new RSRuntimeException(Messages.SERVICE_NOT_UPDATED, RSCode.INTERNAL_SERVER_ERROR);
+                    }
+                }
+            }
+        }
+
+        List<AccountSignature> signatures = accountSignatureRepository.findByPkCodeLocalAccount(codeLocalAccount);
+
+        if(signatures.size() > 0){
+            if(status.equals("BLO")||status.equals("SUS")||status.equals("INA")){
+                for(AccountSignature signature: signatures){
+                    signature.setStatus(status);
+                    try {
+                        this.accountSignatureRepository.save(signature);
+                    } catch (Exception e) {
+                        throw new RSRuntimeException(Messages.SIGNATURE_NOT_UPDATED, RSCode.INTERNAL_SERVER_ERROR);
                     }
                 }
             }

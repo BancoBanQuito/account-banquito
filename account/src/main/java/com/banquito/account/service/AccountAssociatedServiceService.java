@@ -15,6 +15,7 @@ import com.banquito.account.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -55,9 +56,29 @@ public class AccountAssociatedServiceService {
         try {
             this.accountAssociatedServiceRepository.save(accountAssociatedService);
         } catch (Exception e) {
-            throw new RSRuntimeException(Messages.ACCOUNT_NOT_CREATED, RSCode.INTERNAL_SERVER_ERROR);
+            throw new RSRuntimeException(Messages.SERVICE_NOT_CREATED, RSCode.INTERNAL_SERVER_ERROR);
         }
 
         return AccountAssociatedServiceMapper.map(accountAssociatedService);
+    }
+
+    public void updateAssociatedServiceStatus(String codeLocalAccount, String codeAssociatedService, String status){
+
+        Optional<AccountAssociatedService> opService = accountAssociatedServiceRepository.findByPkCodeLocalAccountAndPkCodeAssociatedService(
+                codeLocalAccount, codeAssociatedService);
+
+        if(!opService.isPresent()){
+            throw new RSRuntimeException(Messages.SERVICE_NOT_FOUND, RSCode.NOT_FOUND);
+        }
+
+        AccountAssociatedService accountAssociatedService = opService.get();
+
+        accountAssociatedService.setStatus(status);
+
+        try {
+            this.accountAssociatedServiceRepository.save(accountAssociatedService);
+        } catch (Exception e) {
+            throw new RSRuntimeException(Messages.SERVICE_NOT_UPDATED, RSCode.INTERNAL_SERVER_ERROR);
+        }
     }
 }

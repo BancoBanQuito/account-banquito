@@ -29,7 +29,7 @@ public class ClientRequest {
                 typeIdentification,
                 identification
         );
-
+        
         if(response.getStatusCode().is2xxSuccessful()){
                 Utils.saveLog(response,identification);
                 return new ObjectMapper().convertValue(response.getBody(), RSClientSignature.class);
