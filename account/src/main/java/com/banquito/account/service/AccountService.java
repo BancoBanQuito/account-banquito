@@ -2,6 +2,7 @@ package com.banquito.account.service;
 
 import com.banquito.account.controller.dto.RSAccount;
 import com.banquito.account.controller.dto.RSProductTypeAndClientName;
+import com.banquito.account.controller.mapper.AccountMapper;
 import com.banquito.account.exception.RSRuntimeException;
 import com.banquito.account.model.*;
 import com.banquito.account.repository.AccountAssociatedServiceRepository;
@@ -134,7 +135,7 @@ public class AccountService {
         }
     }
 
-    public Account findAccountByCode(String codeLocalAccount){
+    public RSAccount findAccountByCode(String codeLocalAccount){
 
         Optional<Account> opAccount = accountRepository.findByPkCodeLocalAccount(codeLocalAccount);
 
@@ -142,7 +143,21 @@ public class AccountService {
             throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
         }
 
-        return opAccount.get();
+        Account account = opAccount.get();
+
+        //account client is required to get client id
+        Optional<AccountClient> opClientAccount = accountClientRepository.findByPkCodeLocalAccount(codeLocalAccount);
+
+        if(!opClientAccount.isPresent()){
+            throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
+        }
+
+        AccountClient accountClient = opClientAccount.get();
+
+
+        return AccountMapper.mapAccount(account,
+                accountClient.getPk().getIdentificationType(),
+                accountClient.getPk().getIdentification());
     }
 
     public RSProductTypeAndClientName getAccountProductTypeAndClientName(String codeLocalAccount){

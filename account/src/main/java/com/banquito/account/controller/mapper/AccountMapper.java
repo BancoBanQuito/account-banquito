@@ -24,8 +24,10 @@ public class AccountMapper {
                 .build();
     }
 
-    public static RSAccount mapAccount(Account account) {
+    public static RSAccount mapAccount(Account account, String identificationType, String identification) {
         return RSAccount.builder()
+                .identificationType(identificationType)
+                .identification(identification)
                 .codeLocalAccount(account.getPk().getCodeLocalAccount())
                 .codeInternationalAccount(account.getPk().getCodeInternationalAccount())
                 .product(account.getCodeProduct())

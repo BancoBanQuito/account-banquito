@@ -72,10 +72,10 @@ public class AccountController {
                 return ResponseEntity.status(RSCode.BAD_REQUEST.code).build();
             }
 
-            Account account = accountService.findAccountByCode(codeLocalAccount);
+            RSAccount response = accountService.findAccountByCode(codeLocalAccount);
 
             return ResponseEntity.status(RSCode.SUCCESS.code).
-                    body(RSFormat.<RSAccount>builder().message("Success").data(AccountMapper.mapAccount(account)).build());
+                    body(RSFormat.<RSAccount>builder().message("Success").data(response).build());
 
         } catch (RSRuntimeException e) {
             return ResponseEntity.status(e.getCode()).build();
