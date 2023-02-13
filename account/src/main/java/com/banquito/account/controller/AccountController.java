@@ -1,9 +1,6 @@
 package com.banquito.account.controller;
 
 import com.banquito.account.controller.dto.*;
-import com.banquito.account.request.TransactionRequest;
-import com.banquito.account.request.dto.RQInterest;
-import com.banquito.account.request.dto.RQTransaction;
 import com.banquito.account.utils.Messages;
 import com.banquito.account.utils.RSCode;
 import com.banquito.account.utils.RSFormat;
@@ -15,15 +12,6 @@ import com.banquito.account.utils.Utils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -36,131 +24,125 @@ public class AccountController {
     }
 
     @PostMapping
-    public ResponseEntity<RSFormat> createAccount(@RequestBody RQCreateAccount account) {
+    public ResponseEntity<RSFormat<RSCreateAccount>> createAccount(@RequestBody RQCreateAccount account) {
         try {
 
             if (!Utils.hasAllAttributes(account)) {
-                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
-                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code).build();
             }
 
             Account savedAccount = accountService.createAccount(AccountMapper.map(account), account.getIdentification(), account.getIdentificationType());
             RSCreateAccount responseAccount = AccountMapper.map(savedAccount);
             return ResponseEntity.status(RSCode.CREATED.code)
-                    .body(RSFormat.builder().message("Success").data(responseAccount).build());
+                    .body(RSFormat.<RSCreateAccount>builder().message("Success").data(responseAccount).build());
 
         } catch (RSRuntimeException e) {
-            return ResponseEntity.status(e.getCode())
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
-
+            return ResponseEntity.status(e.getCode()).build();
         } catch (Exception e) {
-            return ResponseEntity.status(RSCode.INTERNAL_SERVER_ERROR.code)
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
+            return ResponseEntity.status(500).build();
         }
     }
 
     @GetMapping(value = "/id/{identificationType}/{identification}")
-    public ResponseEntity<RSFormat> getConsolidateAccounts(
+    public ResponseEntity<RSFormat<List<RSAccount>>> getConsolidateAccounts(
             @PathVariable("identificationType") String identificationType,
             @PathVariable("identification") String identification) {
         try {
 
             if (Utils.isNullEmpty(identificationType) || Utils.isNullEmpty(identification)) {
-                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
-                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code).build();
             }
 
             List<RSAccount> rsAccounts = this.accountService.findAllAccountsByClient(identificationType, identification);
             return ResponseEntity.status(RSCode.SUCCESS.code).
-                    body(RSFormat.builder().message("Success").data(rsAccounts).build());
+                    body(RSFormat.<List<RSAccount>>builder().message("Success").data(rsAccounts).build());
 
         } catch (RSRuntimeException e) {
-            return ResponseEntity.status(e.getCode())
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
-
+            return ResponseEntity.status(e.getCode()).build();
         } catch (Exception e) {
-            return ResponseEntity.status(RSCode.INTERNAL_SERVER_ERROR.code)
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
+            return ResponseEntity.status(500).build();
         }
     }
 
-    @GetMapping(value = "/code/{codeLocalAccount}/{codeInternationalAccount}")
-    public ResponseEntity<RSFormat> getAccountByCode(
-            @PathVariable("codeLocalAccount") String codeLocalAccount,
-            @PathVariable("codeInternationalAccount") String codeInternationalAccount) {
+    @GetMapping(value = "/code/{codeLocalAccount}")
+    public ResponseEntity<RSFormat<RSAccount>> getAccountByCode(@PathVariable("codeLocalAccount") String codeLocalAccount) {
         try {
 
-            if (Utils.isNullEmpty(codeLocalAccount) || Utils.isNullEmpty(codeInternationalAccount)) {
-                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
-                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
+            if (Utils.isNullEmpty(codeLocalAccount)) {
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code).build();
             }
 
-            Account account = accountService.findAccountByCode(codeLocalAccount, codeInternationalAccount);
+            RSAccount response = accountService.findAccountByCode(codeLocalAccount);
 
             return ResponseEntity.status(RSCode.SUCCESS.code).
-                    body(RSFormat.builder().message("Success").data(AccountMapper.mapAccount(account)).build());
+                    body(RSFormat.<RSAccount>builder().message("Success").data(response).build());
 
         } catch (RSRuntimeException e) {
-            return ResponseEntity.status(e.getCode())
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
-
+            return ResponseEntity.status(e.getCode()).build();
         } catch (Exception e) {
-            return ResponseEntity.status(500)
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
+            return ResponseEntity.status(500).build();
         }
     }
 
-    @PutMapping(value = "/code/{codeLocalAccount}/{codeInternationalAccount}/status")
-    public ResponseEntity<RSFormat> updateAccountStatus(
-            @PathVariable("codeLocalAccount") String codeLocalAccount,
-            @PathVariable("codeInternationalAccount") String codeInternationalAccount,
-            @RequestBody RQAccountStatus status) {
+    @GetMapping(value = "/code/{codeLocalAccount}/type")
+    public ResponseEntity<RSFormat<RSProductTypeAndClientName>> getAccountProductTypeAndClientName(@PathVariable("codeLocalAccount") String codeLocalAccount) {
         try {
-            if (!Utils.hasAllAttributes(status) || Utils.isNullEmpty(codeLocalAccount) || Utils.isNullEmpty(codeInternationalAccount)) {
-                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
-                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
+
+            if (Utils.isNullEmpty(codeLocalAccount)) {
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code).build();
             }
 
-            accountService.updateAccountStatus(codeLocalAccount, codeInternationalAccount, status.getStatus());
-            return ResponseEntity.status(RSCode.CREATED.code)
-                    .body(RSFormat.builder().message("Success").data(Messages.SIGNATURE_UPDATED).build());
+            RSProductTypeAndClientName response = accountService.getAccountProductTypeAndClientName(codeLocalAccount);
+
+            return ResponseEntity.status(RSCode.SUCCESS.code).
+                    body(RSFormat.<RSProductTypeAndClientName>builder().message("Success").data(response).build());
 
         } catch (RSRuntimeException e) {
-            return ResponseEntity.status(e.getCode())
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
-
+            return ResponseEntity.status(e.getCode()).build();
         } catch (Exception e) {
-            return ResponseEntity.status(RSCode.INTERNAL_SERVER_ERROR.code)
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    @PutMapping(value = "/code/{codeLocalAccount}/status")
+    public ResponseEntity<RSFormat<String>> updateAccountStatus(
+            @PathVariable("codeLocalAccount") String codeLocalAccount,
+            @RequestBody RQAccountStatus status) {
+        try {
+            if (!Utils.hasAllAttributes(status) || Utils.isNullEmpty(codeLocalAccount)) {
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code).build();
+            }
+
+            accountService.updateAccountStatus(codeLocalAccount,status.getStatus());
+            return ResponseEntity.status(RSCode.CREATED.code)
+                    .body(RSFormat.<String>builder().message("Success").data(Messages.SIGNATURE_UPDATED).build());
+        } catch (RSRuntimeException e) {
+            return ResponseEntity.status(e.getCode()).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
         }
     }
 
 
-    @PutMapping(value = "/code/{codeLocalAccount}/{codeInternationalAccount}/balance")
-    public ResponseEntity<RSFormat> updateAccountBalance(
+    @PutMapping(value = "/code/{codeLocalAccount}/balance")
+    public ResponseEntity<RSFormat<String>> updateAccountBalance(
             @PathVariable("codeLocalAccount") String codeLocalAccount,
-            @PathVariable("codeInternationalAccount") String codeInternationalAccount,
             @RequestBody RQAccountBalance balance) {
         try {
-            if (!Utils.hasAllAttributes(balance) || Utils.isNullEmpty(codeLocalAccount) || Utils.isNullEmpty(codeInternationalAccount)) {
-                return ResponseEntity.status(RSCode.BAD_REQUEST.code)
-                        .body(RSFormat.builder().message("Failure").data(Messages.MISSING_PARAMS).build());
+            if (!Utils.hasAllAttributes(balance) || Utils.isNullEmpty(codeLocalAccount)) {
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code).build();
             }
             accountService.updateAccountBalance(
                     codeLocalAccount,
-                    codeInternationalAccount,
                     balance.getPresentBalance(),
                     balance.getAvailableBalance());
             return ResponseEntity.status(RSCode.CREATED.code)
-                    .body(RSFormat.builder().message("Success").data(Messages.ACCOUNT_UPDATED).build());
+                    .body(RSFormat.<String>builder().message("Success").data(Messages.ACCOUNT_UPDATED).build());
 
         } catch (RSRuntimeException e) {
-            return ResponseEntity.status(e.getCode())
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
-
+            return ResponseEntity.status(e.getCode()).build();
         } catch (Exception e) {
-            return ResponseEntity.status(RSCode.INTERNAL_SERVER_ERROR.code)
-                    .body(RSFormat.builder().message("Failure").data(e.getMessage()).build());
+            return ResponseEntity.status(500).build();
         }
     }
 

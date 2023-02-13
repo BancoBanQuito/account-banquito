@@ -19,6 +19,12 @@ public class RSAccountStatement implements Serializable {
 
     private String localCodeAccount;
 
+    private String identificationType;
+
+    private String identification;
+
+    private String fullName;
+
     private LocalDateTime lastCutOffDate;
 
     private LocalDateTime currentCutOffDate;

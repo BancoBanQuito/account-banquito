@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class RSFormat implements Serializable {
+public class RSFormat<T> implements Serializable {
     private String message;
-    private Object data;
+    private T data;
 }

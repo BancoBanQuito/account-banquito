@@ -13,10 +13,17 @@ import com.banquito.account.request.dto.RSTransaction;
 
 public class AccountStatementMapper {
 
-    public static RSAccountStatement map(AccountStatementLog accountStatement){
+    public static RSAccountStatement map(AccountStatementLog accountStatement,
+                                         String identificationType,
+                                         String identification,
+                                         String fullname
+                                        ){
 
         return RSAccountStatement.builder()
                 .localCodeAccount(accountStatement.getPk().getCodeLocalAccount())
+                .identificationType(identificationType)
+                .identification(identification)
+                .fullName(fullname)
                 .lastCutOffDate(
                         LocalDateTime.ofInstant(accountStatement.getLastCutOffDate().toInstant(), ZoneId.systemDefault())
                 )

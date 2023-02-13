@@ -5,22 +5,21 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.util.Date;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RQSignature implements Serializable {
+public class RSProductTypeAndClientName {
 
     private String codeLocalAccount;
+
+    private String productType;
+
+    private String product;
 
     private String identificationType;
 
     private String identification;
 
-    private String role;
-
-    private Date startDate;
+    private String name;
 }

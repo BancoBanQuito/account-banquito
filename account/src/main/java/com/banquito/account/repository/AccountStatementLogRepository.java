@@ -13,8 +13,7 @@ import com.banquito.account.model.AccountStatementLogPK;
 public interface AccountStatementLogRepository extends JpaRepository<AccountStatementLog, AccountStatementLogPK> {
     public List<AccountStatementLog> findByPkCodeLocalAccountOrderByCurrentCutOffDateDesc(String localCodeAccount);
 
-    public List<AccountStatementLog> findByPkCodeLocalAccountAndPkCodeInternationalAccount(
-            String localCodeAccount, String internationalCodeAccount);
+    public List<AccountStatementLog> findByPkCodeLocalAccount(String localCodeAccount);
 
     public Optional<AccountStatementLog> findByPkCodeAccountStateLog(String codeAccountStateLog);
 }

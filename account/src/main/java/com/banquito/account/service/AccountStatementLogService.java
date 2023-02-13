@@ -6,12 +6,15 @@ import com.banquito.account.controller.dto.RSAccountStatementTransactions;
 import com.banquito.account.controller.mapper.AccountStatementMapper;
 import com.banquito.account.exception.RSRuntimeException;
 import com.banquito.account.model.Account;
-import com.banquito.account.model.AccountPK;
+import com.banquito.account.model.AccountClient;
 import com.banquito.account.model.AccountStatementLog;
 import com.banquito.account.model.AccountStatementLogPK;
+import com.banquito.account.repository.AccountClientRepository;
 import com.banquito.account.repository.AccountRepository;
 import com.banquito.account.repository.AccountStatementLogRepository;
+import com.banquito.account.request.ClientRequest;
 import com.banquito.account.request.TransactionRequest;
+import com.banquito.account.request.dto.RSClientSignature;
 import com.banquito.account.request.dto.RSInterest;
 import com.banquito.account.request.dto.RSTransaction;
 import com.banquito.account.utils.Messages;
@@ -20,6 +23,7 @@ import com.banquito.account.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
@@ -33,40 +37,70 @@ public class AccountStatementLogService {
 
     private final AccountStatementLogRepository accountStatementLogRepository;
     private final AccountRepository accountRepository;
+    private final AccountClientRepository accountClientRepository;
+    private final ClientRequest clientRequest;
+    private final TransactionRequest transactionRequest;
 
     public AccountStatementLogService(AccountStatementLogRepository accountStatementLogRepository,
-            AccountRepository accountRepository) {
+                                      AccountRepository accountRepository,
+                                      AccountClientRepository accountClientRepository,
+                                      ClientRequest clientRequest,
+                                      TransactionRequest transactionRequest) {
         this.accountStatementLogRepository = accountStatementLogRepository;
         this.accountRepository = accountRepository;
+        this.accountClientRepository = accountClientRepository;
+        this.clientRequest = clientRequest;
+        this.transactionRequest = transactionRequest;
     }
 
-    public RSAccountStatement findCurrentAccountStatement(String codeLocalAccount, String codeInternationalAccount) {
+    public RSAccountStatement findCurrentAccountStatement(String codeLocalAccount) {
 
-        AccountPK pk = new AccountPK();
-        pk.setCodeLocalAccount(codeLocalAccount);
-        pk.setCodeInternationalAccount(codeInternationalAccount);
-
-        Optional<Account> opAccount = accountRepository.findById(pk);
+        Optional<Account> opAccount = accountRepository.findByPkCodeLocalAccount(codeLocalAccount);
 
         if(!opAccount.isPresent()){
             throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
         }
 
         Account account = opAccount.get();
+
+        if(!account.getStatus().equals("ACT")){
+            throw new RSRuntimeException("La cuenta no esta activa", RSCode.BAD_REQUEST);
+        }
+
+        Optional<AccountClient> opAccountClient = accountClientRepository.findByPkCodeLocalAccount(codeLocalAccount);
+
+        if(!opAccountClient.isPresent()){
+            throw new RSRuntimeException(Messages.CLIENT_NOT_FOUND, RSCode.NOT_FOUND);
+        }
+
+        AccountClient accountClient = opAccountClient.get();
+
+        //Call api for client name
+        RSClientSignature clientSignature = clientRequest.getClientData(
+                accountClient.getPk().getIdentificationType(),accountClient.getPk().getIdentification());
+
+        if(clientSignature == null){
+            throw new RSRuntimeException(Messages.CLIENT_NOT_FOUND, RSCode.BAD_REQUEST);
+        }
+
+        String fullName = clientSignature.getName() + " " + clientSignature.getLastName();
+
         AccountStatementLog accountStatementLog = computeAccountStatement(account);
 
         if(accountStatementLog == null){
             throw new RSRuntimeException(Messages.STATEMENT_ALREADY_EXIST, RSCode.BAD_REQUEST);
         }
 
-        RSAccountStatement accountStatement = AccountStatementMapper.map(accountStatementLog);
+        RSAccountStatement accountStatement = AccountStatementMapper.map(accountStatementLog,
+                clientSignature.getTypeIndentification(), clientSignature.getIdentification(), fullName);
+
         return findAccountStatementTransactions(accountStatementLog, accountStatement);
     }
 
-    public List<RSAccountStatementList> findAccountStatementList(String codeLocalAccount, String codeInternationalAccount){
+    public List<RSAccountStatementList> findAccountStatementList(String codeLocalAccount){
 
-        List<AccountStatementLog> dbAccountStatements = accountStatementLogRepository.findByPkCodeLocalAccountAndPkCodeInternationalAccount(
-                codeLocalAccount, codeInternationalAccount
+        List<AccountStatementLog> dbAccountStatements = accountStatementLogRepository.findByPkCodeLocalAccount(
+                codeLocalAccount
         );
 
         List<RSAccountStatementList> accountStatements = new ArrayList<>();
@@ -91,6 +125,27 @@ public class AccountStatementLogService {
 
         AccountStatementLog accountStatementLog = opAccountStatementLog.get();
 
+        Optional<AccountClient> opAccountClient = accountClientRepository.findByPkCodeLocalAccount(
+                accountStatementLog.getPk().getCodeLocalAccount()
+        );
+
+        if(!opAccountClient.isPresent()){
+            throw new RSRuntimeException(Messages.CLIENT_NOT_FOUND, RSCode.NOT_FOUND);
+        }
+
+        AccountClient accountClient = opAccountClient.get();
+
+        //Call api for client name
+        RSClientSignature clientSignature = clientRequest.getClientData(
+                accountClient.getPk().getIdentificationType(),accountClient.getPk().getIdentification());
+
+        if(clientSignature == null){
+            throw new RSRuntimeException(Messages.CLIENT_NOT_FOUND, RSCode.BAD_REQUEST);
+        }
+
+        String fullName = clientSignature.getName() + " " + clientSignature.getLastName();
+
+
         Calendar calendar1 = Calendar.getInstance();
         Calendar calendar2 = Calendar.getInstance();
 
@@ -107,7 +162,8 @@ public class AccountStatementLogService {
         accountStatementLog.setLastCutOffDate(calendar1.getTime());
         accountStatementLog.setCurrentCutOffDate(calendar2.getTime());
 
-        RSAccountStatement accountStatement = AccountStatementMapper.map(accountStatementLog);
+        RSAccountStatement accountStatement = AccountStatementMapper.map(accountStatementLog,
+                clientSignature.getTypeIndentification(), clientSignature.getIdentification(), fullName);
         return findAccountStatementTransactions(accountStatementLog, accountStatement);
     }
 
@@ -117,7 +173,7 @@ public class AccountStatementLogService {
         List<RSAccountStatementTransactions> statementTransactions = new ArrayList<>();
         RSAccountStatementTransactions statementTransaction;
 
-        List<RSTransaction> transactions = TransactionRequest.getTransactionsBetweenDates(
+        List<RSTransaction> transactions = transactionRequest.getTransactionsBetweenDates(
                 accountStatementLog.getPk().getCodeLocalAccount(),
                 LocalDateTime.ofInstant(accountStatementLog.getLastCutOffDate().toInstant(), ZoneId.systemDefault()),
                 LocalDateTime.ofInstant(accountStatementLog.getCurrentCutOffDate().toInstant(), ZoneId.systemDefault())
@@ -184,13 +240,13 @@ public class AccountStatementLogService {
             previousBalance = BigDecimal.valueOf(0);
         }
 
-        List<RSTransaction> transactions = TransactionRequest.getTransactionsBetweenDates(
+        List<RSTransaction> transactions = transactionRequest.getTransactionsBetweenDates(
                 account.getPk().getCodeLocalAccount(),
                 lastCutOffDate,
                 currentCutOffDate
         );
 
-        List<RSInterest> dailyBalances = TransactionRequest.getInterestBetweenDates(
+        List<RSInterest> dailyBalances = transactionRequest.getInterestBetweenDates(
                 account.getPk().getCodeLocalAccount(),
                 lastCutOffDate,
                 currentCutOffDate

@@ -4,6 +4,7 @@ public class Messages {
     public static final String SIGNATURE_CREATED = "Firma agregada correctamente";
     public static final String SIGNATURE_UPDATED = "Firma actualizada correctamente";
     public static final String ACCOUNT_UPDATED = "Cuenta actualizada correctamente";
+    public static final String SERVICE_UPDATED = "Servicio actualizado correctamente";
     public static final String ACCOUNT_NOT_CREATED = "Ha ocurrido un error al crear la cuenta";
     public static final String ACCOUNT_NOT_UPDATED = "Ha ocurrido un error al actualizar la cuenta";
     public static final String SIGNATURE_NOT_CREATED = "Ha ocurrido un error al crear la firma";
@@ -16,5 +17,9 @@ public class Messages {
     public static final String STATEMENT_NOT_CREATED = "El estado de cuenta no pudo ser creado";
     public static final String STATEMENT_ALREADY_EXIST = "Ya existe un estado de cuenta para esta fecha";
     public static final String STATEMENT_NOT_FOUND = "No se encontro el estado de cuenta";
+
+    public static final String SERVICE_NOT_CREATED = "Ha ocurrido un error al crear el servicio asociado";
+    public static final String SERVICE_NOT_FOUND = "No se encontro el servicio asociado";
+    public static final String CLIENT_NOT_FOUND = "Cliente no encontrado";
     public static final String INTERNAL_ERROR = "Ha ocurrido un error";
 }
