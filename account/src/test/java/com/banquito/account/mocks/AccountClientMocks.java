@@ -1,6 +1,8 @@
 package com.banquito.account.mocks;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.banquito.account.model.AccountClient;
 import com.banquito.account.model.AccountClientPK;
@@ -23,6 +25,16 @@ public class AccountClientMocks {
                 .createDate(new Date())
                 .status("mockStatus")
                 .build();
+    }
+
+    public static List<AccountClient> getAccountClients() {
+        List<AccountClient> accountClients = new ArrayList<AccountClient>();
+        accountClients.add(getAccountClient());
+        accountClients.add(getAccountClient());
+        accountClients.add(getAccountClient());
+        accountClients.add(getAccountClient());
+
+        return accountClients;
     }
 
 }
