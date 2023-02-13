@@ -35,10 +35,10 @@ public class AccountService {
     private final ClientRequest clientRequest;
 
     public AccountService(AccountRepository accountRepository,
-                          AccountClientRepository accountClientRepository,
-                          AccountSignatureRepository accountSignatureRepository,
-                          AccountAssociatedServiceRepository accountAssociatedServiceRepository,
-                          ClientRequest clientRequest) {
+            AccountClientRepository accountClientRepository,
+            AccountSignatureRepository accountSignatureRepository,
+            AccountAssociatedServiceRepository accountAssociatedServiceRepository,
+            ClientRequest clientRequest) {
         this.accountRepository = accountRepository;
         this.accountClientRepository = accountClientRepository;
         this.accountSignatureRepository = accountSignatureRepository;
@@ -135,56 +135,54 @@ public class AccountService {
         }
     }
 
-    public RSAccount findAccountByCode(String codeLocalAccount){
+    public RSAccount findAccountByCode(String codeLocalAccount) {
 
         Optional<Account> opAccount = accountRepository.findByPkCodeLocalAccount(codeLocalAccount);
 
-        if(!opAccount.isPresent()){
+        if (!opAccount.isPresent()) {
             throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
         }
 
         Account account = opAccount.get();
 
-        //account client is required to get client id
+        // account client is required to get client id
         Optional<AccountClient> opClientAccount = accountClientRepository.findByPkCodeLocalAccount(codeLocalAccount);
 
-        if(!opClientAccount.isPresent()){
+        if (!opClientAccount.isPresent()) {
             throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
         }
 
         AccountClient accountClient = opClientAccount.get();
-
 
         return AccountMapper.mapAccount(account,
                 accountClient.getPk().getIdentificationType(),
                 accountClient.getPk().getIdentification());
     }
 
-    public RSProductTypeAndClientName getAccountProductTypeAndClientName(String codeLocalAccount){
-
+    public RSProductTypeAndClientName getAccountProductTypeAndClientName(String codeLocalAccount) {
 
         Optional<Account> opAccount = accountRepository.findByPkCodeLocalAccount(codeLocalAccount);
 
-        if(!opAccount.isPresent()){
+        if (!opAccount.isPresent()) {
             throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
         }
 
         Account account = opAccount.get();
 
-        //account client is required to get client id
+        // account client is required to get client id
         Optional<AccountClient> opClientAccount = accountClientRepository.findByPkCodeLocalAccount(codeLocalAccount);
 
-        if(!opClientAccount.isPresent()){
+        if (!opClientAccount.isPresent()) {
             throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
         }
 
         AccountClient accountClient = opClientAccount.get();
 
-        //api call to client module
+        // api call to client module
         RSClientSignature clientData = clientRequest.getClientData(
                 accountClient.getPk().getIdentificationType(), accountClient.getPk().getIdentification());
 
-        if(clientData == null){
+        if (clientData == null) {
             throw new RSRuntimeException(Messages.CLIENT_NOT_FOUND, RSCode.BAD_REQUEST);
         }
 
@@ -199,11 +197,11 @@ public class AccountService {
     }
 
     @Transactional
-    public void updateAccountStatus(String codeLocalAccount, String status){
+    public void updateAccountStatus(String codeLocalAccount, String status) {
 
         Optional<Account> opAccount = accountRepository.findByPkCodeLocalAccount(codeLocalAccount);
 
-        if(!opAccount.isPresent()){
+        if (!opAccount.isPresent()) {
             throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
         }
 
@@ -211,11 +209,12 @@ public class AccountService {
 
         account.setStatus(status);
 
-        List<AccountAssociatedService> services = accountAssociatedServiceRepository.findByPkCodeLocalAccount(codeLocalAccount);
+        List<AccountAssociatedService> services = accountAssociatedServiceRepository
+                .findByPkCodeLocalAccount(codeLocalAccount);
 
-        if(services.size() > 0){
-            if(status.equals("BLO")||status.equals("SUS")||status.equals("INA")){
-                for(AccountAssociatedService service: services){
+        if (services.size() > 0) {
+            if (status.equals("BLO") || status.equals("SUS") || status.equals("INA")) {
+                for (AccountAssociatedService service : services) {
                     service.setStatus(status);
                     try {
                         this.accountAssociatedServiceRepository.save(service);
@@ -228,9 +227,9 @@ public class AccountService {
 
         List<AccountSignature> signatures = accountSignatureRepository.findByPkCodeLocalAccount(codeLocalAccount);
 
-        if(signatures.size() > 0){
-            if(status.equals("BLO")||status.equals("SUS")||status.equals("INA")){
-                for(AccountSignature signature: signatures){
+        if (signatures.size() > 0) {
+            if (status.equals("BLO") || status.equals("SUS") || status.equals("INA")) {
+                for (AccountSignature signature : signatures) {
                     signature.setStatus(status);
                     try {
                         this.accountSignatureRepository.save(signature);
@@ -249,11 +248,11 @@ public class AccountService {
     }
 
     @Transactional
-    public void updateAccountBalance(String codeLocalAccount, BigDecimal presentBalance,BigDecimal availableBalance){
+    public void updateAccountBalance(String codeLocalAccount, BigDecimal presentBalance, BigDecimal availableBalance) {
 
         Optional<Account> opAccount = accountRepository.findByPkCodeLocalAccount(codeLocalAccount);
 
-        if(!opAccount.isPresent()){
+        if (!opAccount.isPresent()) {
             throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
         }
 
