@@ -1,0 +1,17 @@
+<200 OK OK
+RSClientSignature(typeIndentification=DNI
+ identification=1750343210
+ name=Diego
+ lastName=Paz
+ signature=https://www.consumer.es/app/uploads/fly-images/110784/img_firma-3-1200x550-cc.jpg)
+[content-type:"application/json"
+ date:"Fri
+ 27 Jan 2023 05:04:57 GMT"
+ vary:"Origin
+Access-Control-Request-Method
+Access-Control-Request-Headers"
+ x-envoy-upstream-service-time:"15746"
+ server:"envoy"
+ transfer-encoding:"chunked"
+ set-cookie:"21e12dac4da445d33b6d339c41b05b97=6617702bb39b995a6cb45dc68d76c501; path=/; HttpOnly"
+ cache-control:"private"]>

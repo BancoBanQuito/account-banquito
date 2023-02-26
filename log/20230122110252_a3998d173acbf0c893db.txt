@@ -1,0 +1,10 @@
+RSTransaction(codeUniqueTransaction=6805118964320778448547913371561257347989231657902179046465265105
+ movement=NOTA CREDITO
+ codeLocalAccount=a3998d173acbf0c893db
+ concept=Calculo interes
+ cuenta de ahorros STANDARD
+ type=INTERES
+ executeDate=2023-01-22T11:02:52.2230545
+ value=0.41
+ presentBalance=500.73
+ availableBalance=500.73)

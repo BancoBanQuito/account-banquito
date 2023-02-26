@@ -1,0 +1,62 @@
+<200 OK OK
+RSClient(id=null
+ identificationType=DNI
+ identification=1004805758
+ lastname=Cabascango
+ firstname=Abigail
+ fullname=null
+ status=null
+ email=abigail.cabascango@espe.edu.ec
+ birthDate=Sun Dec 31 19:00:00 COT 2000
+ gender=F
+ career=Ingemieria de Software
+ companyName=IOET
+ companyType=consultora
+ createDateCompany=Mon Sep 30 19:00:00 COT 2013
+ appLegalRepresent=null
+ articlesAssociatedDoc=null
+ basicServicesDocument=null
+ fingerPrint=null
+ incomeTaxDocument=null
+ lastStatusDate=Mon Sep 30 19:00:00 COT 2013
+ maritalStatus=SIN
+ monthlyAvgIncome=0-399
+ nationality=Ecuatoriano
+ signature=null
+ taxPaymentPlace=EC
+ tinDocument=null
+ workStatus=UNE
+ creationDate=null
+ RSUser=null
+ relationship=[RSClientRelationship(name=null
+ startDate=Mon Sep 30 19:00:00 COT 2013
+ endDate=Mon Sep 30 19:00:00 COT 2013)]
+ reference=[RSClientReference(name=Sara Cabascango
+ phone=+593988654723
+ related=Hermana)
+ RSClientReference(name=Sabi Cabascango
+ phone=+593988654723
+ related=hija)]
+ phone=[RSClientPhone(phoneNumber=+593960953023
+ phoneType=Cel)
+ RSClientPhone(phoneNumber=+593960953022
+ phoneType=Ctelel)
+ RSClientPhone(phoneNumber=022133040
+ phoneType=Tel)]
+ address=[RSClientAddress(codeLocation=null
+ lineOne=Casimiro Nieto
+ lineTwo=HMariana de Jesus
+ latitude=null
+ longitude=null)
+ RSClientAddress(codeLocation=1235
+ lineOne=Casimiro Nieto2
+ lineTwo=HMariana de Jesus2
+ latitude=2
+ longitude=2)]
+ segment=null)
+[Content-Type:"application/json"
+ Transfer-Encoding:"chunked"
+ Date:"Mon
+ 23 Jan 2023 03:57:12 GMT"
+ Keep-Alive:"timeout=60"
+ Connection:"keep-alive"]>

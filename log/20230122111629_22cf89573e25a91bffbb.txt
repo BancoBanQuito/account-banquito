@@ -1,0 +1,4 @@
+RSInvestment(codeLocalAccount=22cf89573e25a91bffbb
+ rawInterest=0.0
+ retention=0.0
+ netInterest=0.0)

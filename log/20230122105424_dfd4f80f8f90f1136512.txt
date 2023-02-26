@@ -1,0 +1,7 @@
+RSInterest(codeLocalAccount=dfd4f80f8f90f1136512
+ codeInternationalAccount=0b6edacd6a13797a079335ca502335a3ad
+ codeUniqueInterest=5720572855498208901891984373840154331730119403543311494999838913
+ ear=6.75
+ availableBalance=450.28
+ value=0.08
+ executeDate=2023-01-22T10:54:23.945476)

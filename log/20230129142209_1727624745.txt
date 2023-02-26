@@ -1,0 +1,17 @@
+<200 OK OK
+RSClientSignature(typeIndentification=DNI
+ identification=1727624745
+ name=Carlos
+ lastName=Arturo
+ signature=https://tusejemplos.com/wp-content/uploads/2016/04/firma-carlos-arturo.png)
+[content-type:"application/json"
+ date:"Sun
+ 29 Jan 2023 19:22:10 GMT"
+ vary:"Origin
+Access-Control-Request-Method
+Access-Control-Request-Headers"
+ x-envoy-upstream-service-time:"16672"
+ server:"envoy"
+ transfer-encoding:"chunked"
+ set-cookie:"fbda6a1bfb579eea315bd860adaf0ae9=d7a8630f3c885f32ace04da4cbeb18aa; path=/; HttpOnly"
+ cache-control:"private"]>

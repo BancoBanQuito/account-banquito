@@ -1,0 +1,14 @@
+<200 OK OK
+RSClientSignature(typeIndentification=DNI
+ identification=1750343210
+ name=Diego
+ lastName=Paz
+ signature=https://www.consumer.es/app/uploads/fly-images/110784/img_firma-3-1200x550-cc.jpg)
+[Content-Type:"application/json"
+ Date:"Tue
+ 24 Jan 2023 00:50:33 GMT"
+ Ngrok-Trace-Id:"887ae675f11c0a0b855407cfc5d7a46e"
+ Vary:"Origin"
+ "Access-Control-Request-Method"
+ "Access-Control-Request-Headers"
+ Transfer-Encoding:"chunked"]>

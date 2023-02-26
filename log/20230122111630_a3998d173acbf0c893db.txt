@@ -1,0 +1,9 @@
+RSTransaction(codeUniqueTransaction=7503292988271208677284884667913399171866495997704161777980108495
+ movement=NOTA DEBITO
+ codeLocalAccount=a3998d173acbf0c893db
+ concept=Retencion 2% de inversion
+ type=INTERES
+ executeDate=2023-01-22T11:16:30.510322
+ value=0.0
+ presentBalance=500.73
+ availableBalance=500.73)

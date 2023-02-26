@@ -1,0 +1,10 @@
+RSTransaction(codeUniqueTransaction=1184152063889622941561969317554342184022176523814873403347847905
+ movement=NOTA CREDITO
+ codeLocalAccount=22cf89573e25a91bffbb
+ concept=Calculo interes
+ cuenta de ahorros GANA DIARIO
+ type=INTERES
+ executeDate=2023-01-22T10:47:54.9217276
+ value=0.02
+ presentBalance=100.08
+ availableBalance=100.08)

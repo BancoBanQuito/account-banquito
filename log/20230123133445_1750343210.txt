@@ -1,0 +1,44 @@
+<200 OK OK
+RSClient(id=null
+ identificationType=null
+ identification=1750343210
+ lastname=null
+ firstname=null
+ fullname=null
+ status=null
+ email=null
+ birthDate=null
+ gender=null
+ career=null
+ companyName=null
+ companyType=null
+ createDateCompany=null
+ appLegalRepresent=null
+ articlesAssociatedDoc=null
+ basicServicesDocument=null
+ fingerPrint=null
+ incomeTaxDocument=null
+ lastStatusDate=null
+ maritalStatus=null
+ monthlyAvgIncome=null
+ nationality=null
+ signature=https://www.consumer.es/app/uploads/fly-images/110784/img_firma-3-1200x550-cc.jpg
+ taxPaymentPlace=null
+ tinDocument=null
+ workStatus=null
+ creationDate=null
+ RSUser=null
+ relationship=null
+ reference=null
+ phone=null
+ address=null
+ segment=null)
+[Vary:"Origin"
+ "Access-Control-Request-Method"
+ "Access-Control-Request-Headers"
+ Content-Type:"application/json"
+ Transfer-Encoding:"chunked"
+ Date:"Mon
+ 23 Jan 2023 18:34:45 GMT"
+ Keep-Alive:"timeout=60"
+ Connection:"keep-alive"]>
