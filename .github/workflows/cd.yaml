@@ -41,4 +41,4 @@ jobs:
         script: |
           docker stop account-banquito || true
           docker rm account-banquito || true
-          docker run --rm -d --name account-banquito -p 80:9000 ${{ secrets.DOCKERHUB_USERNAME }}/account-banquito:${{ github.sha }}
+          docker run --rm -d --name account-banquito -p 78:78 ${{ secrets.DOCKERHUB_USERNAME }}/account-banquito:${{ github.sha }}
