@@ -3,7 +3,7 @@ name: Build and Test Spring Boot Project
 on:
   push:
     branches:
-      - CD-account
+      - main
 
 jobs:
   build:
@@ -24,13 +24,13 @@ jobs:
       run: mvn package --file account/pom.xml
 
     - name: Create docker image
-      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/account-banquito:${{ github.sha }} .
+      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/account-banquito:latest .
 
     - name: Login to Docker Hub
       run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login --username "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
     - name: Push Docker Image
-      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/account-banquito:${{ github.sha }}
+      run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/account-banquito:latest
 
     - name: Connect to EC2 instance using SSH recipe
       uses: appleboy/ssh-action@master
@@ -41,4 +41,4 @@ jobs:
         script: |
           docker stop account-banquito || true
           docker rm account-banquito || true
-          docker run --rm -d --name account-banquito -p 78:78 ${{ secrets.DOCKERHUB_USERNAME }}/account-banquito:${{ github.sha }}
+          docker run --rm -d --name account-banquito -p 80:80 ${{ secrets.DOCKERHUB_USERNAME }}/account-banquito:latest
