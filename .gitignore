@@ -1,7 +1,7 @@
 .vscode/
 .idea/
-.mvn/
-**/.mvn/
+# .mvn/
+# **/.mvn/
 **/.idea/
 **/.vscode/
 
@@ -23,7 +23,7 @@ target/
 .mtj.tmp/
 
 # Package Files #
-*.jar
+#*.jar
 *.war
 *.nar
 *.ear
