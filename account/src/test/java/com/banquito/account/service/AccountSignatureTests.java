@@ -1,4 +1,4 @@
-package com.banquito.account;
+package com.banquito.account.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -42,7 +42,7 @@ public class AccountSignatureTests {
 
 
     @Test
-    public void givenAccountSignature_whenCreateSignature_thenSuccess() throws Exception {
+    public void givenAccountSignature_whenCreateSignature_thenSuccess() {
         //given
         AccountSignature accSignatureExpected = AccountSignatureMock.createSignature();
         AccountSignature accSignatureActual = AccountSignatureMock.createSignature();
@@ -64,6 +64,7 @@ public class AccountSignatureTests {
         assertEquals(accSignatureExpected, accSignatureCaptor.getValue());
     }
 
+    @Test
     public void givenData_whenUpdateSignatureRoleStatus_thenSuccess() throws Exception {
         //given
         AccountSignature accSignature = AccountSignatureMock.createSignature();
