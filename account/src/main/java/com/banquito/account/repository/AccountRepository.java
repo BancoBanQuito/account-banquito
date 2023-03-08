@@ -11,7 +11,7 @@ import com.banquito.account.model.AccountPK;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, AccountPK> {
-    List<Account> findByCodeProductAndCodeProductType(String codeProduct, String codeProductType);
+    List<Account> findByCodeProduct(String codeProduct);
 
     Optional<Account> findByPkCodeLocalAccount(String codeLocalAccount);
 
