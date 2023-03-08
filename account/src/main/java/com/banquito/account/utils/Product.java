@@ -1,14 +1,13 @@
 package com.banquito.account.utils;
 
-import lombok.Builder;
 import lombok.Data;
-
-import java.math.BigDecimal;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
 @Data
-@Builder
+@ConfigurationProperties(prefix = "spring.variable.product")
+@Configuration("productProperties")
 public class Product {
-    private String code;
-    private String type;
-    private BigDecimal interest;
+
+    private String value;
 }

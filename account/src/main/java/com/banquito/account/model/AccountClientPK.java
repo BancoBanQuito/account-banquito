@@ -1,12 +1,19 @@
 package com.banquito.account.model;
 
 import java.io.Serializable;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Embeddable
 public class AccountClientPK implements Serializable{
 
