@@ -3,7 +3,7 @@ name: Spring Boot Maven Test
 on:
   push:
     branches:
-      - *
+      - test/account-services
 
 jobs:
   test:
