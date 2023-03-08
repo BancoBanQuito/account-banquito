@@ -45,7 +45,7 @@ public class AccountService {
             AccountClientRepository accountClientRepository,
             AccountSignatureRepository accountSignatureRepository,
             AccountAssociatedServiceRepository accountAssociatedServiceRepository,
-            ClientRequest clientRequest) {
+            ClientRequest clientRequest, ProductRequest productRequest, TransactionRequest transactionRequest) {
         this.accountRepository = accountRepository;
         this.accountClientRepository = accountClientRepository;
         this.accountSignatureRepository = accountSignatureRepository;
@@ -278,13 +278,13 @@ public class AccountService {
     }
 
     @Transactional
-    public List<Object> computeInterest(String codeLocalAccount){
+    public List<Object> computeInterest(String codeLocalAccount) {
 
         List<Object> responses = new ArrayList<>();
 
         Optional<Account> opAccount = accountRepository.findByPkCodeLocalAccount(codeLocalAccount);
 
-        if(!opAccount.isPresent()){
+        if (!opAccount.isPresent()) {
             throw new RSRuntimeException(Messages.ACCOUNTS_NOT_FOUND_FOR_CODE, RSCode.NOT_FOUND);
         }
 
@@ -293,17 +293,17 @@ public class AccountService {
         List<RSProduct> raws = productRequest.getProducts();
         RSProduct product = null;
 
-        for (RSProduct raw: raws){
-            if(raw.getId().equals(account.getCodeProduct())){
+        for (RSProduct raw : raws) {
+            if (raw.getId().equals(account.getCodeProduct())) {
                 product = raw;
             }
         }
 
-        if(!account.getStatus().equals("ACT")){
+        if (!account.getStatus().equals("ACT")) {
             throw new RSRuntimeException(Messages.ACCOUNT_NOT_ACTIVE, RSCode.NOT_FOUND);
         }
 
-        if(product != null && product.getProductType().equals("Cuenta de ahorros")){
+        if (product != null && product.getProductType().equals("Cuenta de ahorros")) {
             RQInterest interest = RQInterest.builder()
                     .codeLocalAccount(account.getPk().getCodeLocalAccount())
                     .codeInternationalAccount(account.getPk().getCodeInternationalAccount())
@@ -330,19 +330,19 @@ public class AccountService {
 
                 RSTransaction responseTransaction = transactionRequest.createTransaction(transaction);
 
-                if(responseTransaction != null){
+                if (responseTransaction != null) {
                     responses.add(responseTransaction);
                 }
 
             }
-        }else if(product != null && product.getProductType().equals("Inversiones")){
+        } else if (product != null && product.getProductType().equals("Inversiones")) {
 
             SimpleDateFormat sm = new SimpleDateFormat("yyyy-MM-dd");
             String currentDate = sm.format(Utils.currentDate());
 
             String closeDate = sm.format(account.getCloseDate());
 
-            if(currentDate.equals(closeDate)){
+            if (currentDate.equals(closeDate)) {
 
                 LocalDate startDate = LocalDate.parse(sm.format(account.getCreateDate()));
                 LocalDate endDate = LocalDate.parse(closeDate);
@@ -353,10 +353,9 @@ public class AccountService {
                         account.getPk().getCodeLocalAccount(),
                         Math.toIntExact(daysBetween),
                         account.getAvailableBalance(),
-                        product.getInterest()
-                );
+                        product.getInterest());
 
-                if(responseInvestment != null){
+                if (responseInvestment != null) {
                     responses.add(responseInvestment);
 
                     RQTransaction creditTransaction = RQTransaction.builder()
@@ -369,10 +368,10 @@ public class AccountService {
                             .value(responseInvestment.getRawInterest())
                             .build();
 
-                    RSTransaction responseCreditTransaction  = transactionRequest.createTransaction(creditTransaction);
+                    RSTransaction responseCreditTransaction = transactionRequest.createTransaction(creditTransaction);
                     responses.add(responseCreditTransaction);
 
-                    if(responseCreditTransaction != null){
+                    if (responseCreditTransaction != null) {
                         Utils.saveLog(responseCreditTransaction, account.getPk().getCodeLocalAccount());
 
                         RQTransaction debitTransaction = RQTransaction.builder()
@@ -387,19 +386,17 @@ public class AccountService {
 
                         RSTransaction responseDebitTransaction = transactionRequest.createTransaction(debitTransaction);
 
-                        if(responseCreditTransaction != null){
+                        if (responseCreditTransaction != null) {
                             responses.add(responseDebitTransaction);
                         }
                     }
                 }
             }
 
-        }
-        else {
+        } else {
             throw new RSRuntimeException("Product not found", RSCode.NOT_FOUND);
         }
 
         return responses;
     }
 }
-
