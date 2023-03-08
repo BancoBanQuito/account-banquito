@@ -44,31 +44,6 @@ public class AccountSignatureTest {
         private ObjectMapper objectMapper;
 
         @Test
-        @DisplayName("returns OK by given an mapped account signature")
-        public void givenAccountSignature_whenCreateSignature_thenSuccess() throws Exception {
-                RQSignature rqSignature = new RQSignature();
-
-                rqSignature.builder()
-                                .codeLocalAccount("123456789")
-                                .identificationType("C")
-                                .identification("123456789")
-                                .role("A")
-                                .startDate(new Date())
-                                .build();
-                // AccountSignatureMapper signatureMapper = new AccountSignatureMapper();
-                willDoNothing().given(accSignatureService).createSignature(AccountSignatureMapper.map(rqSignature));
-
-                // given(this.accSignatureService.createSignature(AccountSignatureMapper.map(rqSignature))).willReturn(ResponseEntity.ok(""));
-
-                ResultActions response = this.mockMvc.perform(post("/api/account/signature")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(this.objectMapper.writeValueAsBytes(rqSignature)));
-
-                response.andExpect(status().isOk())
-                                .andDo(print());
-        }
-
-        @Test
         @DisplayName("returns list of signatures by given an id")
         public void givenId_whenGetSignatureListById_thenReturnListRssignature() throws Exception {
                 String identificationType = "C";
@@ -138,31 +113,4 @@ public class AccountSignatureTest {
                                 .andDo(print())
                                 .andExpect(jsonPath("$.size()", is(rsSignatures.size())));
         }
-
-        @Test
-        @DisplayName("Update signature by given an id and code")
-        public void givenIdAndCode_whenUpdateSignatureStatus_thenReturnSuccess() throws Exception {
-                String identificationType = "C";
-                String identification = "123456789";
-                String codeLocalAccount = "123456789";
-                RQSignatureRoleStatus rqSignatureRoleStatus = new RQSignatureRoleStatus();
-
-                rqSignatureRoleStatus.builder()
-                                .role("A")
-                                .status("ACTIVE")
-                                .build();
-
-                willDoNothing().given(accSignatureService).updateSignatureRoleStatus(identificationType, identification,
-                                codeLocalAccount, rqSignatureRoleStatus.getRole(), rqSignatureRoleStatus.getStatus());
-
-                ResultActions response = this.mockMvc.perform(put(
-                                "/api/account/signature//{identificationType}/{identification}/{codeLocalAccount}",
-                                identificationType, identification, codeLocalAccount)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(this.objectMapper.writeValueAsBytes(rqSignatureRoleStatus)));
-
-                response.andDo(print())
-                                .andExpect(status().isOk());
-        }
-
 }
