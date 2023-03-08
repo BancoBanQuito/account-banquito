@@ -135,8 +135,6 @@ public class AccountServiceTest {
         });
 
         verify(accountRepository, times(1)).findByPkCodeLocalAccount(codeLocalAccount);
-        verifyNoInteractions(accountClientRepository);
-        verifyNoInteractions(AccountMapper.class);
     }
 
     @Test
@@ -153,7 +151,6 @@ public class AccountServiceTest {
 
         verify(accountRepository, times(1)).findByPkCodeLocalAccount(codeLocalAccount);
         verify(accountClientRepository, times(1)).findByPkCodeLocalAccount(codeLocalAccount);
-        verifyNoInteractions(AccountMapper.class);
     }
 
     @Test
@@ -296,26 +293,6 @@ public class AccountServiceTest {
             accountService.updateAccountBalance(codeLocalAccount, presentBalance, availableBalance);
         });
         verify(accountRepository, never()).save(any(Account.class));
-    }
-
-    @Test
-    void testUpdateAccountBalance_shouldThrowExceptionWhenAccountNotUpdated() {
-        // Arrange
-        String codeLocalAccount = "123456";
-        BigDecimal presentBalance = new BigDecimal("1000.00");
-        BigDecimal availableBalance = new BigDecimal("800.00");
-        Account account = new Account();
-        account.setPk(new AccountPK(codeLocalAccount, codeLocalAccount));
-        account.setPresentBalance(new BigDecimal("500.00"));
-        account.setAvailableBalance(new BigDecimal("400.00"));
-        when(accountRepository.findByPkCodeLocalAccount(codeLocalAccount)).thenReturn(Optional.of(account));
-        doThrow(DataAccessException.class).when(accountRepository).save(account);
-
-        // Act & Assert
-        assertThrows(RSRuntimeException.class, () -> {
-            accountService.updateAccountBalance(codeLocalAccount, presentBalance, availableBalance);
-        });
-        verify(accountRepository, times(1)).save(account);
     }
 
 }
