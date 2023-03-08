@@ -6,6 +6,7 @@ public class Messages {
     public static final String ACCOUNT_UPDATED = "Cuenta actualizada correctamente";
     public static final String SERVICE_UPDATED = "Servicio actualizado correctamente";
     public static final String ACCOUNT_NOT_CREATED = "Ha ocurrido un error al crear la cuenta";
+    public static final String ACCOUNT_NOT_ACTIVE = "La cuenta no esta activa";
     public static final String ACCOUNT_NOT_UPDATED = "Ha ocurrido un error al actualizar la cuenta";
     public static final String SIGNATURE_NOT_CREATED = "Ha ocurrido un error al crear la firma";
     public static final String SIGNATURE_NOT_UPDATED = "Ha ocurrido un error al actualizar la firma";

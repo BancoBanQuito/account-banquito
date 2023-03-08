@@ -104,6 +104,7 @@ public class TransactionRequest {
         map.put("codeLocalAccount", rqInterest.getCodeLocalAccount());
         map.put("codeInternationalAccount", rqInterest.getCodeInternationalAccount());
         map.put("ear", rqInterest.getEar());
+        map.put("baseCalc", rqInterest.getBaseCalc());
         map.put("availableBalance", rqInterest.getAvailableBalance());
 
         // build the request
