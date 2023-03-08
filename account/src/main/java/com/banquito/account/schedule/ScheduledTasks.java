@@ -4,13 +4,12 @@ import com.banquito.account.model.Account;
 import com.banquito.account.model.AccountStatementLog;
 import com.banquito.account.repository.AccountRepository;
 import com.banquito.account.repository.AccountStatementLogRepository;
+import com.banquito.account.request.ProductRequest;
 import com.banquito.account.request.TransactionRequest;
 import com.banquito.account.request.dto.*;
 import com.banquito.account.service.AccountStatementLogService;
-import com.banquito.account.utils.Product;
+import com.banquito.account.request.dto.RSProduct;
 import com.banquito.account.utils.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -22,27 +21,28 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class ScheduledTasks {
 
-    private final Product winEveryDaySavings = Product.builder().code("6c24027751bc43c5b232242e307880a7")
-            .type("4a169d2a0801710e895b0cb2abcfabdb").interest(BigDecimal.valueOf(4.25)).build();
+    /*private final RSProduct winEveryDaySavings = RSProduct.builder().productType("6c24027751bc43c5b232242e307880a7")
+            .id("4a169d2a0801710e895b0cb2abcfabdb").interest(BigDecimal.valueOf(4.25)).build();
 
-    private final Product standardSavings = Product.builder().code("6c24027751bc43c5b232242e307880a7")
-            .type("ed3140ca2610b20511542066357b121f").interest(BigDecimal.valueOf(5.25)).build();
+    private final RSProduct standardSavings = RSProduct.builder().productType("6c24027751bc43c5b232242e307880a7")
+            .id("ed3140ca2610b20511542066357b121f").interest(BigDecimal.valueOf(5.25)).build();
 
-    private final Product standardCurrent = Product.builder().code("bdc60173d3f0a82a1a04557e2d14ee32")
-            .type("bc9699d3e5dafe9903b0dcd7e8778db1").interest(BigDecimal.valueOf(0)).build();
+    private final RSProduct standardCurrent = RSProduct.builder().productType("bdc60173d3f0a82a1a04557e2d14ee32")
+            .id("bc9699d3e5dafe9903b0dcd7e8778db1").interest(BigDecimal.valueOf(0)).build();
 
-    private final Product standardInvestment = Product.builder().code("be04e60db27fd509df44cfdb72dcfd74")
-            .type("96d6161f059d93659aa1ef4662260768").interest(BigDecimal.valueOf(6.5)).build();
+    private final RSProduct standardInvestment = RSProduct.builder().productType("be04e60db27fd509df44cfdb72dcfd74")
+            .id("96d6161f059d93659aa1ef4662260768").interest(BigDecimal.valueOf(6.5)).build();
 
-    private final Product premiumInvestment = Product.builder().code("be04e60db27fd509df44cfdb72dcfd74")
-            .type("344ac2fd48b5e4ea31851193523a26d9").interest(BigDecimal.valueOf(7.5)).build();
+    private final RSProduct premiumInvestment = RSProduct.builder().productType("be04e60db27fd509df44cfdb72dcfd74")
+            .id("344ac2fd48b5e4ea31851193523a26d9").interest(BigDecimal.valueOf(7.5)).build();
 
-    private static final Logger log = LoggerFactory.getLogger(ScheduledTasks.class);
+    private static final Logger log = LoggerFactory.getLogger(ScheduledTasks.class);*/
 
     /*
         Executes every 5 seconds
@@ -57,137 +57,182 @@ public class ScheduledTasks {
 
     private final TransactionRequest transactionRequest;
 
+    private final ProductRequest productRequest;
+
     public ScheduledTasks(AccountRepository accountRepository,
                           AccountStatementLogRepository accountLogRepository,
                           AccountStatementLogService accountLogService,
-                          TransactionRequest transactionRequest){
+                          TransactionRequest transactionRequest, ProductRequest productRequest){
         this.accountRepository = accountRepository;
         this.accountLogRepository = accountLogRepository;
         this.accountLogService = accountLogService;
         this.transactionRequest = transactionRequest;
+        this.productRequest = productRequest;
     }
 
     //Executes every day at 23:55
+    //Savings accounts with daily capitalization
     @Scheduled(cron = "0 55 23 * * *")
-    public void winEveryDaySavingsInterest() {
-        //Cuentas de ahorros gana diario, el interes se capitaliza todos los dias
-        List<Account> accounts = accountRepository.findByCodeProductAndCodeProductType(
-                winEveryDaySavings.getCode(), winEveryDaySavings.getType());
+    public void savingsDailyCapitalization() {
 
-        for (Account account : accounts) {
+        List<RSProduct> raws = productRequest.getProducts();
+        List<RSProduct> products = new ArrayList<>();
 
-            if(!account.getStatus().equals("ACT")){
-                continue;
-            }
-
-            RQInterest interest = RQInterest.builder()
-                    .codeLocalAccount(account.getPk().getCodeLocalAccount())
-                    .codeInternationalAccount(account.getPk().getCodeInternationalAccount())
-                    .ear(winEveryDaySavings.getInterest())
-                    .availableBalance(account.getAvailableBalance())
-                    .build();
-
-            RSInterest responseInterest = transactionRequest.createSavingsAccountInterest(interest);
-
-            if (responseInterest != null) {
-                Utils.saveLog(responseInterest, account.getPk().getCodeLocalAccount());
-
-                RQTransaction transaction = RQTransaction.builder()
-                        .movement("NOTA CREDITO")
-                        .type("INTERES")
-                        .codeLocalAccount(account.getPk().getCodeLocalAccount())
-                        .codeInternationalAccount(account.getPk().getCodeInternationalAccount())
-                        .concept("Calculo interes, cuenta de ahorros GANA DIARIO")
-                        .description("Capitalizacion de intereses de forma diaria")
-                        .value(responseInterest.getValue())
-                        .build();
-
-                RSTransaction responseTransaction = transactionRequest.createTransaction(transaction);
-
-                if(responseTransaction != null){
-                    Utils.saveLog(responseTransaction, account.getPk().getCodeLocalAccount());
-                }
+        for (RSProduct raw: raws){
+            if(raw.getProductType().equals("Cuenta de ahorros")
+                    && raw.getCapitalization().equals("Diario")
+            ){
+                products.add(raw);
             }
         }
-    }
 
-    @Scheduled(cron = "0 55 23 * * *")
-    public void standardSavingsInterest(){
-        //Cuentas de ahorro estandar, el interes se capitaliza el ultimo dia del mes
-        List<Account> accounts = accountRepository.findByCodeProductAndCodeProductType(
-                standardSavings.getCode(), standardSavings.getType());
+        for( RSProduct product: products){
+            List<Account> accounts = accountRepository.findByCodeProduct(product.getId());
 
-        for (Account account : accounts) {
-
-            if(!account.getStatus().equals("ACT")){
-                continue;
-            }
-
-            RQInterest interest = RQInterest.builder()
-                    .codeLocalAccount(account.getPk().getCodeLocalAccount())
-                    .codeInternationalAccount(account.getPk().getCodeInternationalAccount())
-                    .ear(standardSavings.getInterest())
-                    .availableBalance(account.getAvailableBalance())
-                    .build();
-
-            RSInterest responseInterest = transactionRequest.createSavingsAccountInterest(interest);
-
-            if (responseInterest != null) {
-                Utils.saveLog(responseInterest, account.getPk().getCodeLocalAccount());
-            }
-        }
-    }
-
-    //Executes every day at 23:00
-    @Scheduled(cron = "0 0 23 * * *")
-    public void standardSavingsInterestCapitalization(){
-        List<Account> accounts = accountRepository.findByCodeProductAndCodeProductType(
-                standardSavings.getCode(), standardSavings.getType());
-
-        LocalDateTime currentDayOfMonth = OffsetDateTime.now().toLocalDateTime();
-
-        LocalDateTime firstDayOfMonth = OffsetDateTime.now().toLocalDateTime().with(TemporalAdjusters.firstDayOfMonth());
-
-        LocalDateTime lastDayOfMonth = OffsetDateTime.now().toLocalDateTime().with(TemporalAdjusters.lastDayOfMonth());
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-
-        if(formatter.format(currentDayOfMonth).equals(formatter.format(lastDayOfMonth))){
             for (Account account : accounts) {
 
                 if(!account.getStatus().equals("ACT")){
                     continue;
                 }
 
-                BigDecimal interest = BigDecimal.valueOf(0);
-
-                List<RSInterest> dailyBalances = transactionRequest.getInterestBetweenDates(
-                        account.getPk().getCodeLocalAccount(),
-                        firstDayOfMonth,
-                        lastDayOfMonth
-                );
-
-                if(dailyBalances.size() > 0){
-                    for(RSInterest dailyBalance: dailyBalances){
-                        interest = interest.add(dailyBalance.getValue());
-                    }
-                }
-
-                RQTransaction transaction = RQTransaction.builder()
-                        .movement("NOTA CREDITO")
-                        .type("INTERES")
+                RQInterest interest = RQInterest.builder()
                         .codeLocalAccount(account.getPk().getCodeLocalAccount())
                         .codeInternationalAccount(account.getPk().getCodeInternationalAccount())
-                        .concept("Calculo interes, cuenta de ahorros STANDARD")
-                        .description("Capitalizacion de intereses de forma mensual")
-                        .value(interest)
+                        .ear(product.getInterest())
+                        .baseCalc(product.getBaseCalc())
+                        .availableBalance(account.getAvailableBalance())
                         .build();
 
-                RSTransaction responseTransaction = transactionRequest.createTransaction(transaction);
+                RSInterest responseInterest = transactionRequest.createSavingsAccountInterest(interest);
 
-                if(responseTransaction != null){
-                    Utils.saveLog(responseTransaction, account.getPk().getCodeLocalAccount());
+                if (responseInterest != null) {
+                    Utils.saveLog(responseInterest, account.getPk().getCodeLocalAccount());
+
+                    RQTransaction transaction = RQTransaction.builder()
+                            .movement("NOTA CREDITO")
+                            .type("INTERES")
+                            .codeLocalAccount(account.getPk().getCodeLocalAccount())
+                            .codeInternationalAccount(account.getPk().getCodeInternationalAccount())
+                            .concept("Calculo interes, cuenta de ahorros GANA DIARIO")
+                            .description("Capitalizacion de intereses de forma diaria")
+                            .value(responseInterest.getValue())
+                            .build();
+
+                    RSTransaction responseTransaction = transactionRequest.createTransaction(transaction);
+
+                    if(responseTransaction != null){
+                        Utils.saveLog(responseTransaction, account.getPk().getCodeLocalAccount());
+                    }
+                }
+            }
+        }
+    }
+
+    //Savings accounts with monthly capitalization
+    @Scheduled(cron = "0 55 23 * * *")
+    public void savingsMonthlyCapitalization(){
+
+        List<RSProduct> raws = productRequest.getProducts();
+        List<RSProduct> products = new ArrayList<>();
+
+        for (RSProduct raw: raws){
+            if(raw.getProductType().equals("Cuenta de ahorros")
+                    && raw.getCapitalization().equals("Mensual")
+            ){
+                products.add(raw);
+            }
+        }
+
+        for( RSProduct product: products) {
+            List<Account> accounts = accountRepository.findByCodeProduct(product.getId());
+
+            for (Account account : accounts) {
+
+                if(!account.getStatus().equals("ACT")){
+                    continue;
+                }
+
+                RQInterest interest = RQInterest.builder()
+                        .codeLocalAccount(account.getPk().getCodeLocalAccount())
+                        .codeInternationalAccount(account.getPk().getCodeInternationalAccount())
+                        .ear(product.getInterest())
+                        .baseCalc(product.getBaseCalc())
+                        .availableBalance(account.getAvailableBalance())
+                        .build();
+
+                RSInterest responseInterest = transactionRequest.createSavingsAccountInterest(interest);
+
+                if (responseInterest != null) {
+                    Utils.saveLog(responseInterest, account.getPk().getCodeLocalAccount());
+                }
+            }
+        }
+    }
+
+    //Executes every day at 23:00
+    @Scheduled(cron = "0 0 23 * * *")
+    public void monthlyCapitalization(){
+
+        List<RSProduct> raws = productRequest.getProducts();
+        List<RSProduct> products = new ArrayList<>();
+
+        for (RSProduct raw: raws){
+            if(raw.getProductType().equals("Cuenta de ahorros")
+                    && raw.getCapitalization().equals("Mensual")
+            ){
+                products.add(raw);
+            }
+        }
+
+        for( RSProduct product: products) {
+
+            List<Account> accounts = accountRepository.findByCodeProduct(product.getId());
+
+            LocalDateTime currentDayOfMonth = OffsetDateTime.now().toLocalDateTime();
+
+            LocalDateTime firstDayOfMonth = OffsetDateTime.now().toLocalDateTime().with(TemporalAdjusters.firstDayOfMonth());
+
+            LocalDateTime lastDayOfMonth = OffsetDateTime.now().toLocalDateTime().with(TemporalAdjusters.lastDayOfMonth());
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+
+            if(formatter.format(currentDayOfMonth).equals(formatter.format(lastDayOfMonth))){
+                for (Account account : accounts) {
+
+                    if(!account.getStatus().equals("ACT")){
+                        continue;
+                    }
+
+                    BigDecimal interest = BigDecimal.valueOf(0);
+
+                    List<RSInterest> dailyBalances = transactionRequest.getInterestBetweenDates(
+                            account.getPk().getCodeLocalAccount(),
+                            firstDayOfMonth,
+                            lastDayOfMonth
+                    );
+
+                    if(dailyBalances.size() > 0){
+                        for(RSInterest dailyBalance: dailyBalances){
+                            interest = interest.add(dailyBalance.getValue());
+                        }
+                    }
+
+                    RQTransaction transaction = RQTransaction.builder()
+                            .movement("NOTA CREDITO")
+                            .type("INTERES")
+                            .codeLocalAccount(account.getPk().getCodeLocalAccount())
+                            .codeInternationalAccount(account.getPk().getCodeInternationalAccount())
+                            .concept("Calculo interes, cuenta de ahorros STANDARD")
+                            .description("Capitalizacion de intereses de forma mensual")
+                            .value(interest)
+                            .build();
+
+                    RSTransaction responseTransaction = transactionRequest.createTransaction(transaction);
+
+                    if(responseTransaction != null){
+                        Utils.saveLog(responseTransaction, account.getPk().getCodeLocalAccount());
+                    }
                 }
             }
         }
@@ -195,20 +240,24 @@ public class ScheduledTasks {
 
     //Executes every day at 00:30
     @Scheduled(cron = "0 30 0 * * *")
-    public void standardInvestmentInterest(){
-        //Cuentas de inversion estandar, valores menores a 50.000
-       computeInterestInvestment(standardInvestment);
+    public void investmentInterest(){
+
+        List<RSProduct> raws = productRequest.getProducts();
+        List<RSProduct> products = new ArrayList<>();
+
+        for (RSProduct raw: raws){
+            if(raw.getProductType().equals("Inversiones")){
+                products.add(raw);
+            }
+        }
+
+        for( RSProduct product: products) {
+            computeInvestmentInterest(product);
+        }
     }
 
-    @Scheduled(cron = "0 30 0 * * *")
-    public void premiumInvestmentInterest(){
-        //Cuentas de inversion premiun, valores mayores a 50.000
-        computeInterestInvestment(premiumInvestment);
-    }
-
-    private void computeInterestInvestment(Product product){
-        List<Account> accounts = accountRepository.findByCodeProductAndCodeProductType(
-                product.getCode(), product.getType());
+    public void computeInvestmentInterest(RSProduct product){
+        List<Account> accounts = accountRepository.findByCodeProduct(product.getId());
 
         SimpleDateFormat sm = new SimpleDateFormat("yyyy-MM-dd");
         String currentDate = sm.format(Utils.currentDate());
@@ -280,26 +329,23 @@ public class ScheduledTasks {
 
     //Executes the 10th of every month at 00:10
     @Scheduled(cron = "0 10 0 10 * *")
-    public void accountStatementWinEveryDaySavings(){
-        computeAccountStatement(winEveryDaySavings);
+    public void accountStatementSavingsDailyCapitalization(){
+        List<RSProduct> raws = productRequest.getProducts();
+        List<RSProduct> products = new ArrayList<>();
+
+        for (RSProduct raw: raws){
+            if(raw.getProductType().equals("Cuenta de ahorros") || raw.getProductType().equals("Cuenta corriente")){
+                products.add(raw);
+            }
+        }
+
+        for( RSProduct product: products) {
+            computeAccountStatement(product);
+        }
     }
 
-    //Executes the 10th of every month at 01:10
-    @Scheduled(cron = "0 10 1 10 * *")
-    public void accountStatementStandardSavings(){
-        computeAccountStatement(standardSavings);
-    }
-
-
-    //Executes the 10th of every month at 02:10
-    @Scheduled(cron = "0 10 2 10 * *")
-    public void accountStatementCurrentAccount(){
-        computeAccountStatement(standardCurrent);
-    }
-
-    private void computeAccountStatement(Product product){
-        List<Account> accounts = accountRepository.findByCodeProductAndCodeProductType(
-                product.getCode(), product.getType());
+    private void computeAccountStatement(RSProduct product){
+        List<Account> accounts = accountRepository.findByCodeProduct(product.getId());
 
         for (Account account : accounts) {
 

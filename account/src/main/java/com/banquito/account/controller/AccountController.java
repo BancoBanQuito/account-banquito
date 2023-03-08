@@ -1,6 +1,8 @@
 package com.banquito.account.controller;
 
 import com.banquito.account.controller.dto.*;
+import com.banquito.account.request.ProductRequest;
+import com.banquito.account.request.dto.RSProduct;
 import com.banquito.account.utils.Messages;
 import com.banquito.account.utils.RSCode;
 import com.banquito.account.utils.RSFormat;
@@ -12,6 +14,7 @@ import com.banquito.account.utils.Utils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -19,8 +22,11 @@ import java.util.List;
 public class AccountController {
     private final AccountService accountService;
 
-    public AccountController(AccountService accountService) {
+    private final ProductRequest productRequest;
+
+    public AccountController(AccountService accountService, ProductRequest productRequest, ProductRequest productRequest1) {
         this.accountService = accountService;
+        this.productRequest = productRequest;
     }
 
     @PostMapping
@@ -83,6 +89,27 @@ public class AccountController {
             return ResponseEntity.status(500).build();
         }
     }
+
+    @GetMapping(value = "/code/{codeLocalAccount}/interest")
+    public ResponseEntity<RSFormat<List<Object>>> computeInterest(@PathVariable("codeLocalAccount") String codeLocalAccount){
+        try {
+
+            if (Utils.isNullEmpty(codeLocalAccount)) {
+                return ResponseEntity.status(RSCode.BAD_REQUEST.code).build();
+            }
+
+            List<Object> response = accountService.computeInterest(codeLocalAccount);
+
+            return ResponseEntity.status(RSCode.SUCCESS.code).
+                    body(RSFormat.<List<Object>>builder().message("Success").data(response).build());
+
+        } catch (RSRuntimeException e) {
+            return ResponseEntity.status(e.getCode()).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
+
 
     @GetMapping(value = "/code/{codeLocalAccount}/type")
     public ResponseEntity<RSFormat<RSProductTypeAndClientName>> getAccountProductTypeAndClientName(@PathVariable("codeLocalAccount") String codeLocalAccount) {
