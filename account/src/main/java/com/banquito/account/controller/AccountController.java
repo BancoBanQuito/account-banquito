@@ -18,6 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "*", methods = { 
+    org.springframework.web.bind.annotation.RequestMethod.GET,
+    org.springframework.web.bind.annotation.RequestMethod.POST,
+    org.springframework.web.bind.annotation.RequestMethod.PUT,
+    org.springframework.web.bind.annotation.RequestMethod.DELETE })
 @RequestMapping(value = "/api/account")
 public class AccountController {
     private final AccountService accountService;
